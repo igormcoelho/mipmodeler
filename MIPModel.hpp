@@ -1,3 +1,11 @@
+// ==============================
+// Simple class for MIP modeling
+//
+// Author: Igor Machado Coelho
+//
+// Copyleft 2014 - LGPLv3
+// ==============================
+
 #ifndef MIPMODEL_HPP
 #define MIPMODEL_HPP
 
