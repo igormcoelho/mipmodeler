@@ -1,2 +1,2 @@
 all:
-	g++ main.cpp -o mipmodel
+	g++ main.cpp MIPModel.cpp -o mipmodel

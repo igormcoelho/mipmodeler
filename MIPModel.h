@@ -25,20 +25,23 @@ using namespace std;
 class MIPVar
 {
 protected:
+	unsigned index;
 	bool integer;
 	string name;
 
 	double lb;
 	double ub;
 
+	static unsigned count;
+
 public:
 	MIPVar(double _lb = 0, double _ub = MIPInf, bool _integer = false) :
-		name(""), integer(_integer)
+		index(++count), name(""), integer(_integer)
 	{
 	}
 
 	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _integer = false) :
-		name(_name), integer(_integer)
+		index(++count), name(_name), integer(_integer)
 	{
 	}
 
@@ -97,7 +100,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVar(" << (integer?"Integer":"Real") << "):'" << name << "'";
+		ss << "MIPVar#" << index << "(" << (integer?"Integer":"Real") << "):'" << name << "'";
 		return ss.str();
 	}
 };
@@ -106,16 +109,19 @@ public:
 class MIPCons
 {
 protected:
+	unsigned index;
 	string name;
 	char signal;
 	double rhs;
 	vector<double> coefs;
 	vector<MIPVar*> vars;
 
+	static unsigned count;
+
 public:
 
 	MIPCons(char _signal, double _rhs = 0) :
-		name(""), signal(_signal), rhs(_rhs)
+		index(++count), name(""), signal(_signal), rhs(_rhs)
 	{
 		if((signal != '<') && (signal != '=') && (signal != '>'))
 		{
@@ -125,7 +131,7 @@ public:
 	}
 
 	MIPCons(string _name, char _signal, double _rhs = 0) :
-		name(_name), signal(_signal), rhs(_rhs)
+		index(++count), name(_name), signal(_signal), rhs(_rhs)
 	{
 		if((signal != '<') && (signal != '=') && (signal != '>'))
 		{
@@ -195,7 +201,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPCons('" << name << "'): ";
+		ss << "MIPCons#" << index << "('" << name << "'): ";
 		for(unsigned i=0; i<coefs.size(); i++)
 			ss << (coefs[i]>=0?'+':' ') << coefs[i] << " " << vars[i]->toString() << " ";
 		ss << signal << " ";

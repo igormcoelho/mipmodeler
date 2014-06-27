@@ -8,7 +8,7 @@
 
 #include<iostream>
 
-#include "MIPModel.hpp"
+#include "MIPModel.h"
 
 using namespace std;
 
