@@ -24,12 +24,12 @@ protected:
 	double ub;
 
 public:
-	MIPVar(double _lb = 0, double _ub = numeric_limits<double>::infinity(), bool _integer = false) :
+	MIPVar(double _lb = 0, double _ub = MIPInf, bool _integer = false) :
 		name(""), integer(_integer)
 	{
 	}
 
-	MIPVar(string _name, double _lb = 0, double _ub = numeric_limits<double>::infinity(), bool _integer = false) :
+	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _integer = false) :
 		name(_name), integer(_integer)
 	{
 	}
@@ -38,45 +38,45 @@ public:
 	{
 	}
 
-	string getName()
+	inline string getName()
 	{
 		return name;
 	}
 
-	MIPVar& setName(string _name)
+	inline MIPVar& setName(string _name)
 	{
 		name = _name;
 		return *this;
 	}
 
-	double getLowerBound()
+	inline double getLowerBound()
 	{
 		return lb;
 	}
 
-	MIPVar& setLowerBound(double _lb)
+	inline MIPVar& setLowerBound(double _lb)
 	{
 		lb = _lb;
 		return *this;
 	}
 
-	double getUpperBound(double _ub)
+	inline double getUpperBound(double _ub)
 	{
 		return ub;
 	}
 
-	MIPVar& setUpperBound(double _ub)
+	inline MIPVar& setUpperBound(double _ub)
 	{
 		ub = _ub;
 		return *this;
 	}
 
-	bool isInteger()
+	inline bool isInteger()
 	{
 		return integer;
 	}
 
-	bool isReal()
+	inline bool isReal()
 	{
 		return !integer;
 	}
@@ -143,15 +143,40 @@ public:
 		return *this;
 	}
 
-	string getName()
+	inline string getName() const
 	{
 		return name;
 	}
 
-	MIPCons& setName(string _name)
+	inline MIPCons& setName(string _name)
 	{
 		name = _name;
 		return *this;
+	}
+
+	inline unsigned getNumVars() const
+	{
+		return vars.size();
+	}
+
+	inline MIPVar* getVar(unsigned index)
+	{
+		return vars.at(index);
+	}
+
+	inline double getCoef(unsigned index)
+	{
+		return coefs.at(index);
+	}
+
+	inline char getSignal()
+	{
+		return signal;
+	}
+
+	inline double getRHS()
+	{
+		return rhs;
 	}
 
 	void print() const
@@ -179,7 +204,16 @@ protected:
 	vector<MIPVar*> vars;
 	vector<MIPCons*> constraints;
 
+	int varIdx;
+	int consIdx;
+
 public:
+
+	MIPMinimize()
+	{
+		varIdx = 0;
+		consIdx = 0;
+	}
 
 	MIPMinimize& add(double coef, MIPVar* var)
 	{
@@ -187,6 +221,15 @@ public:
 		{
 			coefs.push_back(coef);
 			vars.push_back(var);
+
+			// auto naming
+			if(var->getName() == "")
+			{
+				varIdx++;
+				stringstream ss;
+				ss << "var_" << varIdx;
+				var->setName(ss.str());
+			}
 		}
 
 		return *this;
@@ -195,7 +238,29 @@ public:
 	MIPMinimize& add(MIPCons* cons)
 	{
 		if(cons)
+		{
 			constraints.push_back(cons);
+
+			// auto naming
+			if(cons->getName() == "")
+			{
+				consIdx++;
+				stringstream ss;
+				ss << "cons_" << consIdx;
+				cons->setName(ss.str());
+			}
+
+			// auto naming
+			for(unsigned i=0; i<cons->getNumVars(); i++)
+				if(cons->getVar(i)->getName() == "")
+				{
+					varIdx++;
+					stringstream ss;
+					ss << "var_" << varIdx;
+					cons->getVar(i)->setName(ss.str());
+				}
+
+		}
 
 		return *this;
 	}

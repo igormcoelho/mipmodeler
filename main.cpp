@@ -16,7 +16,7 @@ int main()
     }
 
     x[0]->setLowerBound(10).setUpperBound(100).setName("x_0");
-    x[1]->setLowerBound(20).setUpperBound(100).setName("x_1");
+    x[1]->setUpperBound(100);
 
     model.add(0.8, x[0]);
     model.add(-0.9, x[1]);
