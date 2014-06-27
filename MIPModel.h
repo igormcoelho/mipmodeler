@@ -49,6 +49,11 @@ public:
 	{
 	}
 
+	unsigned getIdx()
+	{
+		return index;
+	}
+
 	inline string getName()
 	{
 		return name;
@@ -138,6 +143,11 @@ public:
 			cout << "MIPConstraint::error! unknown signal '" << signal << "'" << endl;
 			exit(1);
 		}
+	}
+
+	unsigned getIdx()
+	{
+		return index;
 	}
 
 	MIPCons& add(double value)
