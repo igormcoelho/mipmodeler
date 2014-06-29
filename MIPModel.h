@@ -158,7 +158,6 @@ protected:
 	double rhs;
 	vector<double> coefs;
 	vector<MIPVar*> vars;
-	vector<bool> varsDelete;
 
 	static unsigned count;
 	static unsigned count_max;
@@ -197,7 +196,7 @@ public:
 	}
 
 	MIPCons(const MIPCons& cons) :
-		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars), varsDelete(cons.varsDelete)
+		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars)
 	{
 		if(count > count_max)
 			count_max = count;
@@ -209,11 +208,7 @@ public:
 		if(count==0)
 			count_max=0;
 
-		for(unsigned i=0; i<vars.size(); i++)
-			if(varsDelete[i])
-				delete vars[i];
 		vars.clear();
-		varsDelete.clear();
 		coefs.clear();
 	}
 
@@ -228,24 +223,12 @@ public:
 		return *this;
 	}
 
-	MIPCons& add(double coef, MIPVar* var)
-	{
-		if(var)
-		{
-			coefs.push_back(coef);
-			vars.push_back(var);
-			varsDelete.push_back(false);
-		}
-
-		return *this;
-	}
-
 	MIPCons& add(double coef, MIPVar& var)
 	{
-		MIPVar* pVar = new MIPVar(var);
-		MIPCons& _this = add(coef, pVar);
-		varsDelete[varsDelete.size()-1] = true;
-		return _this;
+		coefs.push_back(coef);
+		vars.push_back(&var);
+
+		return *this;
 	}
 
 	inline string getName() const
