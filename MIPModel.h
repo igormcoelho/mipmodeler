@@ -28,7 +28,7 @@ class MIPVar
 {
 protected:
 	unsigned index;
-	bool integer;
+	bool type;
 	string name;
 
 	double lb;
@@ -44,22 +44,22 @@ public:
 		return count_max;
 	}
 
-	MIPVar(double _lb = 0, double _ub = MIPInf, bool _integer = false) :
-		index(++count),  integer(_integer), name(""), lb(_lb), ub(_ub)
+	MIPVar(double _lb = 0, double _ub = MIPInf, bool _type = MIPReal) :
+		index(++count),  type(_type), name(""), lb(_lb), ub(_ub)
 	{
 		if(count > count_max)
 			count_max = count;
 	}
 
-	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _integer = false) :
-		index(++count), integer(_integer), name(_name), lb(_lb), ub(_ub)
+	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _type = MIPReal) :
+		index(++count), type(_type), name(_name), lb(_lb), ub(_ub)
 	{
 		if(count > count_max)
 			count_max = count;
 	}
 
 	MIPVar(const MIPVar& var) :
-		index(++count), name(var.name), integer(var.integer), lb(var.lb), ub(var.ub)
+		index(++count), name(var.name), type(var.type), lb(var.lb), ub(var.ub)
 	{
 		if(count > count_max)
 			count_max = count;
@@ -112,12 +112,12 @@ public:
 
 	inline bool isInteger() const
 	{
-		return integer;
+		return type == MIPInteger;
 	}
 
 	inline bool isReal() const
 	{
-		return !integer;
+		return type == MIPReal;
 	}
 
 	void print() const
@@ -128,7 +128,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVar#" << index << "(" << (integer?"Integer":"Real") << "):'" << name;
+		ss << "MIPVar#" << index << "(" << (type==MIPInteger?"Integer":"Real") << "):'" << name;
 		ss << "'{" << lb << ";";
 		ss << ub << "}";
 		return ss.str();
@@ -139,7 +139,7 @@ public:
 		if(&var == this)
 			return *this;
 
-		integer = var.integer;
+		type = var.type;
 		name = var.name;
 		lb   = var.lb;
 		ub   = var.ub;
