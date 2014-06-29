@@ -42,7 +42,7 @@ int main()
     model.print();
 
     c1.setName("restricao");
-    x[0] = MIPVar("maluco", 4, MIPInteger);
+    x[0] = MIPVar("maluco", 4, MIPInf, MIPInteger);
 
     model.print();
 
