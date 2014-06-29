@@ -24,7 +24,7 @@ int main()
 
     for(unsigned i=0; i<10; i++)
     {
-	x[i]=MIPVar(0, MIPInf, MIPInteger); 
+	x[i]=MIPVar(MIPInteger, 0, MIPInf); 
     }
     x.print();
     x.renameVars();
@@ -42,7 +42,7 @@ int main()
     model.print();
 
     c1.setName("restricao");
-    x[0] = MIPVar("maluco", 4, MIPInf, MIPInteger);
+    x[0] = MIPVar("maluco", MIPReal, 4, MIPInf);
 
     model.print();
 

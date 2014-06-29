@@ -44,14 +44,14 @@ public:
 		return count_max;
 	}
 
-	MIPVar(double _lb = 0, double _ub = MIPInf, bool _type = MIPReal) :
+	MIPVar(bool _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
 		index(++count),  type(_type), name(""), lb(_lb), ub(_ub)
 	{
 		if(count > count_max)
 			count_max = count;
 	}
 
-	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _type = MIPReal) :
+	MIPVar(string _name, bool _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
 		index(++count), type(_type), name(_name), lb(_lb), ub(_ub)
 	{
 		if(count > count_max)
