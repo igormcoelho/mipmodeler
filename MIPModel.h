@@ -21,14 +21,14 @@ using namespace std;
 
 
 #define MIPInf numeric_limits<double>::infinity()
-#define MIPInteger true
-#define MIPReal false
+
+enum MIPType { MIPReal, MIPBinary, MIPInteger };
 
 class MIPVar
 {
 protected:
 	unsigned index;
-	bool type;
+	MIPType type;
 	string name;
 
 	double lb;
@@ -44,14 +44,14 @@ public:
 		return count_max;
 	}
 
-	MIPVar(bool _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
+	MIPVar(MIPType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
 		index(++count),  type(_type), name(""), lb(_lb), ub(_ub)
 	{
 		if(count > count_max)
 			count_max = count;
 	}
 
-	MIPVar(string _name, bool _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
+	MIPVar(string _name, MIPType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
 		index(++count), type(_type), name(_name), lb(_lb), ub(_ub)
 	{
 		if(count > count_max)
@@ -115,6 +115,11 @@ public:
 		return type == MIPInteger;
 	}
 
+	inline bool isBinary() const
+	{
+		return type == MIPBinary;
+	}
+
 	inline bool isReal() const
 	{
 		return type == MIPReal;
@@ -128,9 +133,15 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVar#" << index << "(" << (type==MIPInteger?"Integer":"Real") << "):'" << name;
-		ss << "'{" << lb << ";";
-		ss << ub << "}";
+		ss << "MIPVar#" << index << "(";
+		if(isInteger())
+			ss << "Integer";
+		else if(isBinary())
+			ss << "Binary";
+		else
+			ss << "Real";
+		ss << "):'" << name << "'{" << lb << ";" << ub << "}";
+
 		return ss.str();
 	}
 
