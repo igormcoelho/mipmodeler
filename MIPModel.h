@@ -374,7 +374,92 @@ public:
 
 	void writeLP(string filename)
 	{
+		if(vars.size() == 0)
+			return;
+		if(constraints.size() == 0)
+			return;
 
+		const int LINE_BASE_OBJ  = 6;
+		const int LINE_SIZE_OBJ  = 45;
+		const int LINE_BASE_CONS = 29;
+		const int LINE_SIZE_CONS = 60;
+
+		FILE* f = fopen(filename.c_str(), "w");
+		fprintf(f, "\\ENCODING=ISO-8859-1\n\\Problem name: \nMinimize\n obj: "); 
+
+		string var1 = formatLPVar(coefs[0], vars[0]->getName(), false);
+		fprintf(f, "%s", var1.c_str());
+		int countCharObj = var1.length();
+		for(unsigned v=1; v<vars.size(); v++)
+		{
+			string var_v = formatLPVar(coefs[v], vars[v]->getName(), true);
+			fprintf(f, " %s", var_v.c_str());
+			countCharObj += var_v.length();
+			if(countCharObj >= LINE_SIZE_OBJ)
+			{
+				fprintf(f, "\n");
+				for(int i=0; i<LINE_BASE_OBJ; i++)
+					fprintf(f, " ");
+				countCharObj = 0;
+			}
+		}
+
+		if(countCharObj != 0)
+			fprintf(f, "\n");
+		fprintf(f, "Subject To\n");
+
+		for(unsigned c=0; c<constraints.size(); c++)
+		{
+			string cname = constraints[c]->getName();
+			fprintf(f, " %s:", cname.c_str());
+
+			for(int i=0; i<LINE_BASE_CONS-2-cname.length(); i++)
+				fprintf(f, " ");
+
+			string var1 = formatLPVar(constraints[c]->getCoef(0), constraints[c]->getVar(0).getName(), false);
+			fprintf(f, "%s", var1.c_str());
+			int countCharObj = var1.length();
+			for(unsigned v=1; v<constraints[c]->getNumVars(); v++)
+			{
+				string var_v = formatLPVar(constraints[c]->getCoef(v), constraints[c]->getVar(v).getName(), true);
+				fprintf(f, " %s", var_v.c_str());
+				countCharObj += var_v.length();
+				if(countCharObj >= LINE_SIZE_CONS)
+				{
+					fprintf(f, "\n");
+					for(int i=0; i<LINE_BASE_CONS; i++)
+						fprintf(f, " ");
+					countCharObj = 0;
+				}
+			}
+
+			stringstream ssrhs;
+			ssrhs << " " << constraints[c]->getSignal() << (constraints[c]->getSignal()=='='?"":"=") << " " << constraints[c]->getRHS() << endl;
+			fprintf(f, "%s", ssrhs.str().c_str());
+		}
+
+		fclose(f);
+	}
+
+private:
+	inline string formatLPVar(const double& coef, const string& varName, bool signal)
+	{
+		if(coef == 0)
+			return "";
+
+		stringstream ss;
+		if(signal)
+			ss << (coef>=0?"+":"-") << " " << myabs(coef) << " " << varName;
+		else
+			ss << (coef>=0?"":"-")  << " " << myabs(coef) << " " << varName;
+		return ss.str();
+	}
+
+	double myabs(double x)
+	{
+		if(x < 0)
+			return -1*x;
+		return x;
 	}
 };
 

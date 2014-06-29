@@ -41,14 +41,17 @@ int main()
 
     model.print();
 
-    c1.setName("restricao");
-    x[0] = MIPVar("maluco", MIPReal, 4, MIPInf);
+    c1.setName("restriction_name");
+    x[0] = MIPVar("new_x_0", MIPReal, 4, MIPInf);
 
     model.print();
+
+    model.writeLP("test.lp");
 
 
     cout << "Count MIPVar: " << MIPVar::getCountMax() << endl;
     cout << "Count MIPCons: " << MIPCons::getCountMax() << endl;
+
     cout << "Finished successfully!" << endl;
 
     return 0;
