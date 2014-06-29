@@ -35,25 +35,41 @@ protected:
 	double ub;
 
 	static unsigned count;
+	static unsigned count_max;
 
 public:
+
+	inline static unsigned getCountMax()
+	{
+		return count_max;
+	}
+
 	MIPVar(double _lb = 0, double _ub = MIPInf, bool _integer = false) :
 		index(++count),  integer(_integer), name(""), lb(_lb), ub(_ub)
 	{
+		if(count > count_max)
+			count_max = count;
 	}
 
 	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _integer = false) :
 		index(++count), integer(_integer), name(_name), lb(_lb), ub(_ub)
 	{
+		if(count > count_max)
+			count_max = count;
 	}
 
 	MIPVar(const MIPVar& var) :
 		index(++count), name(var.name), integer(var.integer), lb(var.lb), ub(var.ub)
 	{
+		if(count > count_max)
+			count_max = count;
 	}
 
 	virtual ~MIPVar()
 	{
+		count--;
+		if(count==0)
+			count_max=0;
 	}
 
 	unsigned getIdx()
@@ -123,7 +139,6 @@ public:
 		if(&var == this)
 			return *this;
 
-		index = ++count;
 		integer = var.integer;
 		name = var.name;
 		lb   = var.lb;
@@ -146,12 +161,21 @@ protected:
 	vector<bool> varsDelete;
 
 	static unsigned count;
+	static unsigned count_max;
 
 public:
+
+	inline static unsigned getCountMax()
+	{
+		return count_max;
+	}
 
 	MIPCons(char _signal, double _rhs = 0) :
 		index(++count), name(""), signal(_signal), rhs(_rhs)
 	{
+		if(count > count_max)
+			count_max = count;
+
 		if((signal != '<') && (signal != '=') && (signal != '>'))
 		{
 			cout << "MIPCons::error! unknown signal '" << signal << "'" << endl;
@@ -162,6 +186,9 @@ public:
 	MIPCons(string _name, char _signal, double _rhs = 0) :
 		index(++count), name(_name), signal(_signal), rhs(_rhs)
 	{
+		if(count > count_max)
+			count_max = count;
+
 		if((signal != '<') && (signal != '=') && (signal != '>'))
 		{
 			cout << "MIPConstraint::error! unknown signal '" << signal << "'" << endl;
@@ -172,10 +199,16 @@ public:
 	MIPCons(const MIPCons& cons) :
 		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars), varsDelete(cons.varsDelete)
 	{
+		if(count > count_max)
+			count_max = count;
 	}
 
 	virtual ~MIPCons()
 	{
+		count--;
+		if(count==0)
+			count_max=0;
+
 		for(unsigned i=0; i<vars.size(); i++)
 			if(varsDelete[i])
 				delete vars[i];
