@@ -21,6 +21,8 @@ using namespace std;
 
 
 #define MIPInf numeric_limits<double>::infinity()
+#define MIPInteger true
+#define MIPReal false
 
 class MIPVar
 {
@@ -216,9 +218,9 @@ public:
 		return vars.size();
 	}
 
-	inline MIPVar* getVar(unsigned index)
+	inline MIPVar& getVar(unsigned index)
 	{
-		return vars.at(index);
+		return *vars.at(index);
 	}
 
 	inline double getCoef(unsigned index)
@@ -260,7 +262,6 @@ protected:
 	vector<double> coefs;
 	vector<MIPVar*> vars;
 	vector<MIPCons*> constraints;
-	vector<bool> consDelete;
 
 	int varIdx;
 	int consIdx;
@@ -275,77 +276,56 @@ public:
 
 	virtual ~MIPMinimize()
 	{
-		for(unsigned i=0; i<vars.size(); i++)
-			delete vars[i];
-		cout << "|consDelete|=" << consDelete.size() << endl;
-		cout << "|constraints|=" << constraints.size() << endl;
-		for(unsigned i=0; i<consDelete.size(); i++)
-			if(consDelete[i])
-				delete constraints[i];
 		constraints.clear();
-		consDelete.clear();
 		coefs.clear();
 		vars.clear();
 	}
 
-	MIPMinimize& add(double coef, const MIPVar& _var)
+	MIPMinimize& add(double coef, MIPVar& var)
 	{
 		coefs.push_back(coef);
-		MIPVar* var = new MIPVar(_var);
-		vars.push_back(var);
+		vars.push_back(&var);
 
 		// auto naming
-		if(var->getName() == "")
+		if(var.getName() == "")
 		{
 			varIdx++;
 			stringstream ss;
 			ss << "var_" << varIdx;
-			var->setName(ss.str());
+			var.setName(ss.str());
 		}
 		
 		return *this;
 	}
 
-	MIPMinimize& add(MIPCons* cons)
+	MIPMinimize& add(MIPCons& cons)
 	{
-		if(cons)
+		constraints.push_back(&cons);
+
+		// auto naming
+		if(cons.getName() == "")
 		{
-			constraints.push_back(cons);
-			consDelete.push_back(false);
-
-			// auto naming
-			if(cons->getName() == "")
-			{
-				consIdx++;
-				stringstream ss;
-				ss << "cons_" << consIdx;
-				cons->setName(ss.str());
-			}
-
-			// auto naming
-			for(unsigned i=0; i<cons->getNumVars(); i++)
-				if(cons->getVar(i)->getName() == "")
-				{
-					varIdx++;
-					stringstream ss;
-					ss << "var_" << varIdx;
-					cons->getVar(i)->setName(ss.str());
-				}
-
+			consIdx++;
+			stringstream ss;
+			ss << "cons_" << consIdx;
+			cons.setName(ss.str());
 		}
+
+		// auto naming
+		for(unsigned i=0; i<cons.getNumVars(); i++)
+			if(cons.getVar(i).getName() == "")
+			{
+				varIdx++;
+				stringstream ss;
+				ss << "var_" << varIdx;
+				cons.getVar(i).setName(ss.str());
+			}
 
 		return *this;
 	}
 
-	MIPMinimize& add(const MIPCons& _cons)
-	{
-		MIPCons* cons = new MIPCons(_cons);
-		MIPMinimize& _this = add(cons);
-		consDelete[consDelete.size()-1] = true;
-		return _this;
-	}
 
-	string toStringLP() const
+	string toString() const
 	{
 		stringstream ss;
 		ss << "Minimize: ";
@@ -358,9 +338,9 @@ public:
 		return ss.str();
 	}
 
-	void printLP() const
+	void print() const
 	{
-		cout << toStringLP() << endl;
+		cout << toString() << endl;
 	}
 
 	void writeLP(string filename)

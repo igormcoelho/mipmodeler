@@ -22,7 +22,7 @@ int main()
     x.print();
     for(unsigned i=0; i<10; i++)
     {
-	x.push_back(MIPVar(0, MIPInf, true)); 
+	x.push_back(MIPVar(0, MIPInf, MIPInteger)); 
     }
 
     x[0].setLowerBound(10).setUpperBound(100);
@@ -40,7 +40,12 @@ int main()
 
     model.add(c1);
 
-    model.printLP();
+    model.print();
+
+    c1.setName("restricao");
+    x[0] = MIPVar("maluco", 4, MIPInteger);
+
+    model.print();
 
     return 0;
 }
