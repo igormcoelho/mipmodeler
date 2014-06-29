@@ -237,6 +237,7 @@ protected:
 	vector<double> coefs;
 	vector<MIPVar*> vars;
 	vector<MIPCons*> constraints;
+	vector<bool> consDelete;
 
 	int varIdx;
 	int consIdx;
@@ -247,6 +248,17 @@ public:
 	{
 		varIdx = 0;
 		consIdx = 0;
+	}
+
+	virtual ~MIPMinimize()
+	{
+		for(unsigned i=0; i<consDelete.size(); i++)
+			if(consDelete[i])
+				delete constraints[i];
+		constraints.clear();
+		consDelete.clear();
+		coefs.clear();
+		vars.clear();
 	}
 
 	MIPMinimize& add(double coef, MIPVar* var)
@@ -274,6 +286,7 @@ public:
 		if(cons)
 		{
 			constraints.push_back(cons);
+			consDelete.push_back(false);
 
 			// auto naming
 			if(cons->getName() == "")
@@ -297,6 +310,14 @@ public:
 		}
 
 		return *this;
+	}
+
+	MIPMinimize& add(const MIPCons& _cons)
+	{
+		MIPCons* cons = new MIPCons(_cons);
+		MIPMinimize& _this = add(cons);
+		consDelete[consDelete.size()-1] = true;
+		return _this;
 	}
 
 	string toStringLP() const

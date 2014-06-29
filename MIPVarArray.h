@@ -35,6 +35,9 @@ public:
 
 	~MIPVarArray()
 	{
+		for(unsigned i=0; i<v.size(); i++)
+			delete v[i];
+		v.clear();
 	}
 
 	inline MIPVar* operator[](unsigned index)
@@ -67,6 +70,11 @@ public:
 		v.push_back(var);
 	}
 
+	inline void push_back(const MIPVar& var)
+	{
+		v.push_back(new MIPVar(var));
+	}
+
 	string toString() const
 	{
 		stringstream ss;
@@ -81,7 +89,8 @@ public:
 	{
 		cout << toString() << endl;
 	}
-}
+};
 
 
 #endif
+

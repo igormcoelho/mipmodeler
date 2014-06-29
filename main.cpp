@@ -9,6 +9,7 @@
 #include<iostream>
 
 #include "MIPModel.h"
+#include "MIPVarArray.h"
 
 using namespace std;
 
@@ -17,7 +18,7 @@ int main()
 
     MIPMinimize model;
 
-    vector<MIPVar*> x;
+    MIPVarArray x;
     for(unsigned i=0; i<10; i++)
     {
 	x.push_back(new MIPVar(0, MIPInf, true)); 
@@ -33,7 +34,7 @@ int main()
     c1.add(1.0, x[0]);
     c1.add(0.0, x[1]);
 
-    model.add(&c1);
+    model.add(c1);
 
     model.printLP();
 
