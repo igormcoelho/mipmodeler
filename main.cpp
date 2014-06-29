@@ -15,18 +15,17 @@ using namespace std;
 
 int main()
 {
-
     MIPMinimize model;
 
-    MIPVarArray x("x");
-    x.print();
-    for(unsigned i=0; i<10; i++)
-    {
-	x.push_back(MIPVar(0, MIPInf, MIPInteger)); 
-    }
-
+    MIPVarArray x(10, "x");
     x[0].setLowerBound(10).setUpperBound(100);
     x[1].setUpperBound(100);
+    x.print();
+
+    for(unsigned i=0; i<10; i++)
+    {
+	x[i]=MIPVar(0, MIPInf, MIPInteger); 
+    }
     x.print();
     x.renameVars();
     x.print();

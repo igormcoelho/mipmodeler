@@ -38,17 +38,17 @@ protected:
 
 public:
 	MIPVar(double _lb = 0, double _ub = MIPInf, bool _integer = false) :
-		index(++count), name(""), integer(_integer)
+		index(++count),  integer(_integer), name(""), lb(_lb), ub(_ub)
 	{
 	}
 
 	MIPVar(string _name, double _lb = 0, double _ub = MIPInf, bool _integer = false) :
-		index(++count), name(_name), integer(_integer)
+		index(++count), integer(_integer), name(_name), lb(_lb), ub(_ub)
 	{
 	}
 
 	MIPVar(const MIPVar& var) :
-		index(++count), name(var.name), integer(var.integer)
+		index(++count), name(var.name), integer(var.integer), lb(var.lb), ub(var.ub)
 	{
 	}
 
@@ -112,8 +112,24 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVar#" << index << "(" << (integer?"Integer":"Real") << "):'" << name << "'";
+		ss << "MIPVar#" << index << "(" << (integer?"Integer":"Real") << "):'" << name;
+		ss << "'{" << lb << ";";
+		ss << ub << "}";
 		return ss.str();
+	}
+
+	MIPVar& operator=(const MIPVar& var)
+	{
+		if(&var == this)
+			return *this;
+
+		index = ++count;
+		integer = var.integer;
+		name = var.name;
+		lb   = var.lb;
+		ub   = var.ub;
+
+		return *this;
 	}
 };
 
@@ -160,9 +176,6 @@ public:
 
 	virtual ~MIPCons()
 	{
-		cout << "~MIPCons(" << name << ")" << endl;
-		cout << "|vars|=" << vars.size() << endl;
-		cout << "|varsDelete|=" << varsDelete.size() << endl;
 		for(unsigned i=0; i<vars.size(); i++)
 			if(varsDelete[i])
 				delete vars[i];
