@@ -109,7 +109,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVarArray(" << size() << "): ";
+		ss << "MIPVarArray('" << name << "'," << size() << "): " << endl;
 		for(unsigned i=0; i<v.size(); i++)
 			ss << (v[i]==NULL?"NULL":v[i]->toString()) << "\t";
 		ss << endl;
@@ -215,7 +215,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVarArray2(" << size() << "): " << endl;
+		ss << "MIPVarArray2('" << name << "'," << size() << "): " << endl;
 		for(unsigned i=0; i<v.size(); i++)
 			ss << v[i]->toString() << endl;
 		return ss.str();
@@ -321,9 +321,9 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVarArray3(" << size() << "): " << endl;
+		ss << "MIPVarArray3('" << name << "'," << size() << "): " << endl;
 		for(unsigned i=0; i<v.size(); i++)
-			ss << "\t" << v[i]->toString() << endl;
+			ss << v[i]->toString() << endl;
 		return ss.str();
 	}
 
