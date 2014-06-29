@@ -45,6 +45,11 @@ public:
 	{
 	}
 
+	MIPVar(const MIPVar& var) :
+		index(++count), name(var.name), integer(var.integer)
+	{
+	}
+
 	virtual ~MIPVar()
 	{
 	}
@@ -143,6 +148,11 @@ public:
 			cout << "MIPConstraint::error! unknown signal '" << signal << "'" << endl;
 			exit(1);
 		}
+	}
+
+	MIPCons(const MIPCons& cons) :
+		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars)
+	{
 	}
 
 	unsigned getIdx()
