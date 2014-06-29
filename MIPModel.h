@@ -59,7 +59,7 @@ public:
 		return index;
 	}
 
-	inline string getName()
+	inline string getName() const
 	{
 		return name;
 	}
@@ -70,7 +70,7 @@ public:
 		return *this;
 	}
 
-	inline double getLowerBound()
+	inline double getLowerBound() const
 	{
 		return lb;
 	}
@@ -81,7 +81,7 @@ public:
 		return *this;
 	}
 
-	inline double getUpperBound(double _ub)
+	inline double getUpperBound(double _ub) const
 	{
 		return ub;
 	}
@@ -92,12 +92,12 @@ public:
 		return *this;
 	}
 
-	inline bool isInteger()
+	inline bool isInteger() const
 	{
 		return integer;
 	}
 
-	inline bool isReal()
+	inline bool isReal() const
 	{
 		return !integer;
 	}
@@ -125,6 +125,7 @@ protected:
 	double rhs;
 	vector<double> coefs;
 	vector<MIPVar*> vars;
+	vector<bool> varsDelete;
 
 	static unsigned count;
 
@@ -151,8 +152,21 @@ public:
 	}
 
 	MIPCons(const MIPCons& cons) :
-		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars)
+		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars), varsDelete(cons.varsDelete)
 	{
+	}
+
+	virtual ~MIPCons()
+	{
+		cout << "~MIPCons(" << name << ")" << endl;
+		cout << "|vars|=" << vars.size() << endl;
+		cout << "|varsDelete|=" << varsDelete.size() << endl;
+		for(unsigned i=0; i<vars.size(); i++)
+			if(varsDelete[i])
+				delete vars[i];
+		vars.clear();
+		varsDelete.clear();
+		coefs.clear();
 	}
 
 	unsigned getIdx()
@@ -172,9 +186,18 @@ public:
 		{
 			coefs.push_back(coef);
 			vars.push_back(var);
+			varsDelete.push_back(false);
 		}
 
 		return *this;
+	}
+
+	MIPCons& add(double coef, MIPVar& var)
+	{
+		MIPVar* pVar = new MIPVar(var);
+		MIPCons& _this = add(coef, pVar);
+		varsDelete[varsDelete.size()-1] = true;
+		return _this;
 	}
 
 	inline string getName() const
@@ -252,6 +275,10 @@ public:
 
 	virtual ~MIPMinimize()
 	{
+		for(unsigned i=0; i<vars.size(); i++)
+			delete vars[i];
+		cout << "|consDelete|=" << consDelete.size() << endl;
+		cout << "|constraints|=" << constraints.size() << endl;
 		for(unsigned i=0; i<consDelete.size(); i++)
 			if(consDelete[i])
 				delete constraints[i];
@@ -261,23 +288,21 @@ public:
 		vars.clear();
 	}
 
-	MIPMinimize& add(double coef, MIPVar* var)
+	MIPMinimize& add(double coef, const MIPVar& _var)
 	{
-		if(var)
+		coefs.push_back(coef);
+		MIPVar* var = new MIPVar(_var);
+		vars.push_back(var);
+
+		// auto naming
+		if(var->getName() == "")
 		{
-			coefs.push_back(coef);
-			vars.push_back(var);
-
-			// auto naming
-			if(var->getName() == "")
-			{
-				varIdx++;
-				stringstream ss;
-				ss << "var_" << varIdx;
-				var->setName(ss.str());
-			}
+			varIdx++;
+			stringstream ss;
+			ss << "var_" << varIdx;
+			var->setName(ss.str());
 		}
-
+		
 		return *this;
 	}
 

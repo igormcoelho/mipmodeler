@@ -18,14 +18,18 @@ int main()
 
     MIPMinimize model;
 
-    MIPVarArray x;
+    MIPVarArray x("x");
+    x.print();
     for(unsigned i=0; i<10; i++)
     {
-	x.push_back(new MIPVar(0, MIPInf, true)); 
+	x.push_back(MIPVar(0, MIPInf, true)); 
     }
 
-    x[0]->setLowerBound(10).setUpperBound(100).setName("x_0");
-    x[1]->setUpperBound(100);
+    x[0].setLowerBound(10).setUpperBound(100);
+    x[1].setUpperBound(100);
+    x.print();
+    x.renameVars();
+    x.print();
 
     model.add(0.8, x[0]);
     model.add(-0.9, x[1]);
