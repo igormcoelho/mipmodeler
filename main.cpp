@@ -15,6 +15,21 @@ using namespace std;
 
 int main()
 {
+    // model MIPMinimize
+    // methods: add(double obj_coefficient, MIPVar&), add(MIPCons&), print(), writeLP(string filename)
+
+    // Arrays: 'MIPVarArray([optional: string name], [optional: size])', 'MIPVarArray2' ... 'MIPVarArray5', access by [][]...[]
+    // methods: print(), renameVars)(), access by []
+
+    // Variable: MIPVar([optional: string name], type, lowerbound, upperbound)
+    // type can be: MIPInteger, MIPBinary, MIPReal
+    // lowerbound can be any number, or -MIPInf
+    // upperbound can be any number, or MIPInf
+    // methods: toString(), print(), setName(s), getName, setLowerBound(lb), getLowerBound, setUpperBound(ub), getUpperBound()
+
+    // Constraint: MIPCons([optional: string name], char signal {'<', '=', '>'}, double right_hand_side)
+    // all methods add to left hand side: add(double coefficient, MIPVar&), add(double constant), setName(s), getName()
+
     MIPMinimize model;
 
     MIPVarArray x(10, "x");
