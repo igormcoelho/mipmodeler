@@ -23,12 +23,12 @@ using namespace std;
 
 #define MIPInf numeric_limits<double>::infinity()
 
-enum MIPType { MIPReal, MIPBinary, MIPInteger };
+enum MIPVarType { MIPReal, MIPBinary, MIPInteger };
 
 class MIPVar
 {
 protected:
-	MIPType type;
+	MIPVarType type;
 	string name;
 
 	double lb;
@@ -36,12 +36,12 @@ protected:
 
 public:
 
-	MIPVar(MIPType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
+	MIPVar(MIPVarType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
 		type(_type), name(""), lb(_lb), ub(_ub)
 	{
 	}
 
-	MIPVar(string _name, MIPType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
+	MIPVar(string _name, MIPVarType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
 		type(_type), name(_name), lb(_lb), ub(_ub)
 	{
 	}
