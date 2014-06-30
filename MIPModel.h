@@ -23,6 +23,8 @@ using namespace std;
 
 #define MIPInf numeric_limits<double>::infinity()
 
+enum MIPType { MIPMinimize, MIPMaximize };
+
 enum MIPVarType { MIPReal, MIPBinary, MIPInteger };
 
 class MIPVar
@@ -250,9 +252,10 @@ public:
 };
 
 
-class MIPMinimize
+class MIPModel
 {
 protected:
+	MIPType type;
 	vector<double> coefs;
 	vector<MIPVar*> vars;
 	vector<MIPCons*> constraints;
@@ -262,20 +265,21 @@ protected:
 
 public:
 
-	MIPMinimize()
+	MIPModel(MIPType _type) :
+		type(_type)
 	{
 		varIdx = 0;
 		consIdx = 0;
 	}
 
-	virtual ~MIPMinimize()
+	virtual ~MIPModel()
 	{
 		constraints.clear();
 		coefs.clear();
 		vars.clear();
 	}
 
-	MIPMinimize& add(double coef, MIPVar& var)
+	MIPModel& add(double coef, MIPVar& var)
 	{
 		coefs.push_back(coef);
 		vars.push_back(&var);
@@ -292,7 +296,7 @@ public:
 		return *this;
 	}
 
-	MIPMinimize& add(MIPCons& cons)
+	MIPModel& add(MIPCons& cons)
 	{
 		constraints.push_back(&cons);
 
@@ -322,7 +326,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "Minimize: ";
+		ss << (type==MIPMinimize?"Minimize":"Maximize") << ": ";
 		for(unsigned i=0; i<coefs.size(); i++)
 			ss << (coefs[i]>=0?'+':' ') << coefs[i] << " " << vars[i]->toString() << " ";
 		ss << endl;
@@ -354,7 +358,7 @@ public:
 		const int LINE_SIZE_CONS = 60;
 
 		FILE* f = fopen(filename.c_str(), "w");
-		fprintf(f, "\\ENCODING=ISO-8859-1\n\\Problem name: \nMinimize\n obj: "); 
+		fprintf(f, "\\ENCODING=ISO-8859-1\n\\Problem name: \n%s\n obj: ", (type==MIPMinimize?"Minimize":"Maximize")); 
 
 		addUniqueByType(vars[0], vbin, vint, vreal);
 		string var1 = formatLPVar(coefs[0], vars[0]->getName(), false);

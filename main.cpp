@@ -15,7 +15,7 @@ using namespace std;
 
 int main()
 {
-    // model MIPMinimize
+    // model MIPModel(type={MIPMinimize;MIPMaximize})
     // methods: add(double obj_coefficient, MIPVar&), add(MIPCons&), print(), writeLP(string filename)
 
     // Arrays: 'MIPVarArray([optional: string name], [optional: size])', 'MIPVarArray2' ... 'MIPVarArray5', access by [][]...[]
@@ -30,7 +30,7 @@ int main()
     // Constraint: MIPCons([optional: string name], char signal {'<', '=', '>'}, double right_hand_side)
     // all methods add to left hand side: add(double coefficient, MIPVar&), add(double constant), setName(s), getName()
 
-    MIPMinimize model;
+    MIPModel model(MIPMaximize);
 
     MIPVarArray x(10, "x");
     x[0].setLowerBound(10).setUpperBound(100);
