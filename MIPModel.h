@@ -13,6 +13,7 @@
 #include<sstream>
 #include<limits>
 #include<vector>
+#include<algorithm>
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -99,7 +100,7 @@ public:
 		return *this;
 	}
 
-	inline double getUpperBound(double _ub) const
+	inline double getUpperBound() const
 	{
 		return ub;
 	}
@@ -390,6 +391,10 @@ public:
 		if(constraints.size() == 0)
 			return;
 
+		vector<MIPVar*> vbin;
+		vector<MIPVar*> vreal;
+		vector<MIPVar*> vint;
+
 		const int LINE_BASE_OBJ  = 6;
 		const int LINE_SIZE_OBJ  = 45;
 		const int LINE_BASE_CONS = 29;
@@ -398,11 +403,13 @@ public:
 		FILE* f = fopen(filename.c_str(), "w");
 		fprintf(f, "\\ENCODING=ISO-8859-1\n\\Problem name: \nMinimize\n obj: "); 
 
+		addUniqueByType(vars[0], vbin, vint, vreal);
 		string var1 = formatLPVar(coefs[0], vars[0]->getName(), false);
 		fprintf(f, "%s", var1.c_str());
 		int countCharObj = var1.length();
 		for(unsigned v=1; v<vars.size(); v++)
 		{
+			addUniqueByType(vars[v], vbin, vint, vreal);
 			string var_v = formatLPVar(coefs[v], vars[v]->getName(), true);
 			fprintf(f, " %s", var_v.c_str());
 			countCharObj += var_v.length();
@@ -417,6 +424,7 @@ public:
 
 		if(countCharObj != 0)
 			fprintf(f, "\n");
+
 		fprintf(f, "Subject To\n");
 
 		for(unsigned c=0; c<constraints.size(); c++)
@@ -427,11 +435,13 @@ public:
 			for(int i=0; i<LINE_BASE_CONS-2-cname.length(); i++)
 				fprintf(f, " ");
 
+			addUniqueByType(&constraints[c]->getVar(0), vbin, vint, vreal);
 			string var1 = formatLPVar(constraints[c]->getCoef(0), constraints[c]->getVar(0).getName(), false);
 			fprintf(f, "%s", var1.c_str());
 			int countCharObj = var1.length();
 			for(unsigned v=1; v<constraints[c]->getNumVars(); v++)
 			{
+				addUniqueByType(&constraints[c]->getVar(v), vbin, vint, vreal);
 				string var_v = formatLPVar(constraints[c]->getCoef(v), constraints[c]->getVar(v).getName(), true);
 				fprintf(f, " %s", var_v.c_str());
 				countCharObj += var_v.length();
@@ -449,7 +459,57 @@ public:
 			fprintf(f, "%s", ssrhs.str().c_str());
 		}
 
-		fprintf("Bounds\n");
+		fprintf(f, "Bounds\n");
+
+		std::sort(vbin.begin(), vbin.end(), orderName);
+		std::sort(vint.begin(), vint.end(), orderName);
+		std::sort(vreal.begin(), vreal.end(), orderName);
+
+		for(unsigned i=0; i<vbin.size(); i++)
+			fprintf(f, "%s\n", printBound(*vbin[i]).c_str());
+		for(unsigned i=0; i<vint.size(); i++)
+			fprintf(f, "%s\n", printBound(*vint[i]).c_str());
+		for(unsigned i=0; i<vreal.size(); i++)
+			fprintf(f, "%s\n", printBound(*vreal[i]).c_str());
+		if(vbin.size() > 0)
+		{
+			fprintf(f, "Binaries\n");
+			const int CHAR_LIMIT = 69;
+			int countChar = 0;
+			for(unsigned i=0; i<vbin.size(); i++)
+			{
+				string var = vbin[i]->getName();
+				fprintf(f, " %s", var.c_str()); 
+				countChar += var.length();
+				if(countChar >= CHAR_LIMIT)
+				{
+					countChar = 0;
+					fprintf(f, "\n");
+				}
+			}
+			if(countChar != 0)
+				fprintf(f, "\n");
+		}
+		if(vint.size() > 0)
+		{
+			fprintf(f, "Generals\n");
+			const int CHAR_LIMIT = 69;
+			int countChar = 0;
+			for(unsigned i=0; i<vint.size(); i++)
+			{
+				string var = vint[i]->getName();
+				fprintf(f, " %s", var.c_str()); 
+				countChar += var.length();
+				if(countChar >= CHAR_LIMIT)
+				{
+					countChar = 0;
+					fprintf(f, "\n");
+				}
+			}
+			if(countChar != 0)
+				fprintf(f, "\n");
+		}
+		fprintf(f, "End\n");
 
 		fclose(f);
 	}
@@ -473,6 +533,47 @@ private:
 		if(x < 0)
 			return -1*x;
 		return x;
+	}
+
+	void addUniqueByType(MIPVar* var, vector<MIPVar*>& vBinary, vector<MIPVar*>& vInteger, vector<MIPVar*>& vReal)
+	{
+		if(var->isInteger())
+			addUnique(var, vInteger);
+		else if(var->isBinary())
+			addUnique(var, vBinary);
+		else
+			addUnique(var, vReal);
+	}
+
+	void addUnique(MIPVar* var, vector<MIPVar*>& v)
+	{
+		for(unsigned i=0; i<v.size(); i++)
+			if(v[i]->getName() == var->getName())
+				return;
+		v.push_back(var);
+	}
+
+	static bool orderName(const MIPVar* v1, const MIPVar* v2)
+	{
+		return v1->getName() < v2->getName();
+	}
+
+	string printBound(MIPVar& var)
+	{
+		stringstream ss;
+		if(var.getLowerBound() == var.getUpperBound())
+			ss << "      " << var.getName() << " = " << var.getLowerBound();
+		else if((var.getLowerBound() != -MIPInf) && (var.getUpperBound() != MIPInf))
+			ss << " " << var.getLowerBound() << " <= " << var.getName() << " <= " << var.getUpperBound();
+		else if(var.getUpperBound() == MIPInf)
+			ss << "      " << var.getName() << " >= " << var.getLowerBound();
+		else
+		{
+			cout << "ERROR! DONT KNOW HOW TO PRINT VARIABLE: " << var.toString() << endl;
+			exit(1);
+		}
+
+		return ss.str();
 	}
 };
 
