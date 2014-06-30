@@ -28,55 +28,33 @@ enum MIPType { MIPReal, MIPBinary, MIPInteger };
 class MIPVar
 {
 protected:
-	unsigned index;
 	MIPType type;
 	string name;
 
 	double lb;
 	double ub;
 
-	static unsigned count;
-	static unsigned count_max;
-
 public:
 
-	inline static unsigned getCountMax()
-	{
-		return count_max;
-	}
-
 	MIPVar(MIPType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
-		index(++count),  type(_type), name(""), lb(_lb), ub(_ub)
+		type(_type), name(""), lb(_lb), ub(_ub)
 	{
-		if(count > count_max)
-			count_max = count;
 	}
 
 	MIPVar(string _name, MIPType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
-		index(++count), type(_type), name(_name), lb(_lb), ub(_ub)
+		type(_type), name(_name), lb(_lb), ub(_ub)
 	{
-		if(count > count_max)
-			count_max = count;
 	}
 
 	MIPVar(const MIPVar& var) :
-		index(++count), name(var.name), type(var.type), lb(var.lb), ub(var.ub)
+		name(var.name), type(var.type), lb(var.lb), ub(var.ub)
 	{
-		if(count > count_max)
-			count_max = count;
 	}
 
 	virtual ~MIPVar()
 	{
-		count--;
-		if(count==0)
-			count_max=0;
 	}
 
-	unsigned getIdx()
-	{
-		return index;
-	}
 
 	inline string getName() const
 	{
@@ -134,7 +112,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPVar#" << index << "(";
+		ss << "MIPVar(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -164,28 +142,17 @@ public:
 class MIPCons
 {
 protected:
-	unsigned index;
 	string name;
 	char signal;
 	double rhs;
 	vector<double> coefs;
 	vector<MIPVar*> vars;
 
-	static unsigned count;
-	static unsigned count_max;
-
 public:
 
-	inline static unsigned getCountMax()
-	{
-		return count_max;
-	}
-
 	MIPCons(char _signal, double _rhs = 0) :
-		index(++count), name(""), signal(_signal), rhs(_rhs)
+		name(""), signal(_signal), rhs(_rhs)
 	{
-		if(count > count_max)
-			count_max = count;
 
 		if((signal != '<') && (signal != '=') && (signal != '>'))
 		{
@@ -195,11 +162,8 @@ public:
 	}
 
 	MIPCons(string _name, char _signal, double _rhs = 0) :
-		index(++count), name(_name), signal(_signal), rhs(_rhs)
+		name(_name), signal(_signal), rhs(_rhs)
 	{
-		if(count > count_max)
-			count_max = count;
-
 		if((signal != '<') && (signal != '=') && (signal != '>'))
 		{
 			cout << "MIPConstraint::error! unknown signal '" << signal << "'" << endl;
@@ -208,25 +172,14 @@ public:
 	}
 
 	MIPCons(const MIPCons& cons) :
-		index(++count), name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars)
+		name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars)
 	{
-		if(count > count_max)
-			count_max = count;
 	}
 
 	virtual ~MIPCons()
 	{
-		count--;
-		if(count==0)
-			count_max=0;
-
 		vars.clear();
 		coefs.clear();
-	}
-
-	unsigned getIdx()
-	{
-		return index;
 	}
 
 	MIPCons& add(double value)
@@ -287,7 +240,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPCons#" << index << "('" << name << "'): ";
+		ss << "MIPCons('" << name << "'): ";
 		for(unsigned i=0; i<coefs.size(); i++)
 			ss << (coefs[i]>=0?'+':' ') << coefs[i] << " " << vars[i]->toString() << " ";
 		ss << signal << " ";

@@ -63,10 +63,6 @@ int main()
 
     model.writeLP("test.lp");
 
-
-    cout << "Count MIPVar: " << MIPVar::getCountMax() << endl;
-    cout << "Count MIPCons: " << MIPCons::getCountMax() << endl;
-
     cout << "Finished successfully!" << endl;
 
     return 0;
