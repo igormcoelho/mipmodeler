@@ -11,6 +11,8 @@
 #include "MIPModel.h"
 #include "MIPVarArray.h"
 
+#include "EMIPModelTest.h"
+
 using namespace std;
 
 int main()
