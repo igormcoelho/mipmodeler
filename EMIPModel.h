@@ -29,7 +29,7 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo };
 
 class Expr
 {
@@ -894,7 +894,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPSum{" << body.toString() << "} ";
+		ss << "EMIPSum({" << body.toString() << "}) ";
 		return ss.str();
 	}
 };
@@ -929,7 +929,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPSumIn(" << v.toString() << " in " << s.toString() << "{" << Sum::body.toString() << "} ";
+		ss << "EMIPSumIn(" << v.toString() << " in " << s.toString() << "{" << Sum::body.toString() << "}) ";
 		return ss.str();
 	}
 };
@@ -965,10 +965,118 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPSumTo(" << v.toString() << " <- " << begin.toString() << " to " << end.toString() << " { " << Sum::body.toString() << "} ";
+		ss << "EMIPSumTo(" << v.toString() << " <- " << begin.toString() << " to " << end.toString() << "{ " << Sum::body.toString() << "}) ";
 		return ss.str();
 	}
 };
+
+
+class ForAll
+{
+protected:
+	vector<ForAll> list;
+public:
+	ForAll()
+	{
+	}
+
+	ForAll& add(ForAll fa)
+	{
+		list.push_back(fa);
+		return *this;
+	}
+
+	virtual ~ForAll()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdForAll;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPForAll(" << list.size() << "){";
+		for(unsigned i=0; i<list.size(); i++)
+			ss << list[i].toString() << " ";
+		ss << "} ";
+		return ss.str();
+	}
+};
+
+
+class ForAllIn : public ForAll
+{
+protected:
+	Var v;
+	Set s;
+	Comp st; // such that
+public:
+	ForAllIn(Var _v, Set _s) :
+		v(_v), s(_s)
+	{
+	}
+
+	ForAllIn(Var _v, Set _s, Comp _st) :
+		v(_v), s(_s), st(_st)
+	{
+	}
+
+	virtual ~ForAllIn()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdForAllIn;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPForAllIn(" << v.toString() << " in " << s.toString() << ") ";
+		return ss.str();
+	}
+};
+
+
+class ForAllTo : public ForAll
+{
+protected:
+	Var v;
+	Expr begin;
+	Expr end;
+	Comp st; // such that
+public:
+	ForAllTo(Var _v, Expr _begin, Expr _end) :
+		v(_v), begin(_begin), end(_end)
+	{
+	}
+
+	ForAllTo(Var _v, Expr _begin, Expr _end, Comp _st) :
+		v(_v), begin(_begin), end(_end), st(_st)
+	{
+	}
+
+	virtual ~ForAllTo()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdForAllTo;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPForAllTo(" << v.toString() << " <- " << begin.toString() << " to " << end.toString() << ") ";
+		return ss.str();
+	}
+};
+
 
 
 
