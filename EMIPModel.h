@@ -27,7 +27,7 @@ const double Inf = numeric_limits<double>::infinity();
 
 enum ProblemType { Minimize, Maximize };
 
-enum VarType { Real, Binary, Integer }; // (?)
+enum VarType { Real, Binary, Integer, Unknown }; // (?)
 
 enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse };
 
@@ -92,7 +92,7 @@ protected:
 	string name;
 public:
 
-	Var(string _name, VarType _type = Real) :
+	Var(string _name, VarType _type = Unknown) :
 		type(_type), name(_name)
 	{
 	}
@@ -137,12 +137,14 @@ public:
 		stringstream ss;
 		ss << "EMIPVar(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 
 		return ss.str();
 	}
@@ -164,7 +166,7 @@ protected:
 	Expr& i1;
 public:
 
-	Var1Index(string _name, const Expr&  _i1, VarType _type = Real) :
+	Var1Index(string _name, const Expr&  _i1, VarType _type = Unknown) :
 		Var(_name, _type), i1(_i1.clone())
 	{
 	}
@@ -183,12 +185,14 @@ public:
 		stringstream ss;
 		ss << "EMIPVar1Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "] ";
 
 		return ss.str();
@@ -207,7 +211,7 @@ protected:
 	Expr& i2;
 public:
 
-	Var2Index(string _name, const Expr&  _i1, const Expr&  _i2, VarType _type = Real) :
+	Var2Index(string _name, const Expr&  _i1, const Expr&  _i2, VarType _type = Unknown) :
 		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
@@ -226,12 +230,14 @@ public:
 		stringstream ss;
 		ss << "EMIPVar2Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "] ";
 		return ss.str();
@@ -251,7 +257,7 @@ protected:
 	Expr& i3;
 public:
 
-	Var3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Real) :
+	Var3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Unknown) :
 		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
@@ -270,12 +276,14 @@ public:
 		stringstream ss;
 		ss << "EMIPVar3Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "]";
 		ss << "[" << i3.toString() << "] ";
@@ -298,7 +306,7 @@ protected:
 	Expr& i4;
 public:
 
-	Var4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Real) :
+	Var4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Unknown) :
 		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
@@ -317,12 +325,14 @@ public:
 		stringstream ss;
 		ss << "EMIPVar4Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "]";
 		ss << "[" << i3.toString() << "]";
@@ -347,7 +357,7 @@ protected:
 	Expr& i5;
 public:
 
-	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Real) :
+	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Unknown) :
 		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
@@ -366,12 +376,14 @@ public:
 		stringstream ss;
 		ss << "EMIPVar5Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "]";
 		ss << "[" << i3.toString() << "]";
@@ -394,7 +406,7 @@ protected:
 	string name;
 public:
 
-	Par(string _name, VarType _type = Real) :
+	Par(string _name, VarType _type = Unknown) :
 		type(_type), name(_name)
 	{
 	}
@@ -439,12 +451,14 @@ public:
 		stringstream ss;
 		ss << "EMIPPar(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 
 		return ss.str();
 	}
@@ -461,7 +475,7 @@ protected:
 	Expr& i1;
 public:
 
-	Par1Index(string _name, const Expr& _i1, VarType _type = Real) :
+	Par1Index(string _name, const Expr& _i1, VarType _type = Unknown) :
 		Par(_name, _type), i1(_i1.clone())
 	{
 	}
@@ -480,12 +494,14 @@ public:
 		stringstream ss;
 		ss << "EMIPPar1Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "] ";
 
 		return ss.str();
@@ -504,7 +520,7 @@ protected:
 	Expr& i2;
 public:
 
-	Par2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Real) :
+	Par2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Unknown) :
 		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
@@ -523,12 +539,14 @@ public:
 		stringstream ss;
 		ss << "EMIPPar2Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "] ";
 		return ss.str();
@@ -548,7 +566,7 @@ protected:
 	Expr& i3;
 public:
 
-	Par3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Real) :
+	Par3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Unknown) :
 		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
@@ -567,12 +585,14 @@ public:
 		stringstream ss;
 		ss << "EMIPPar3Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "]";
 		ss << "[" << i3.toString() << "] ";
@@ -595,7 +615,7 @@ protected:
 	Expr& i4;
 public:
 
-	Par4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Real) :
+	Par4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Unknown) :
 		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
@@ -614,12 +634,14 @@ public:
 		stringstream ss;
 		ss << "EMIPPar4Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "]";
 		ss << "[" << i3.toString() << "]";
@@ -644,7 +666,7 @@ protected:
 	Expr& i5;
 public:
 
-	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Real) :
+	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Unknown) :
 		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
@@ -663,12 +685,14 @@ public:
 		stringstream ss;
 		ss << "EMIPPar5Index(";
 		if(isInteger())
-			ss << "Integer";
+			ss << "Integer,";
 		else if(isBinary())
-			ss << "Binary";
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
 		else
-			ss << "Real";
-		ss << ",'" << name << "')";
+			ss << "";
+		ss << "'" << name << "')";
 		ss << "[" << i1.toString() << "]";
 		ss << "[" << i2.toString() << "]";
 		ss << "[" << i3.toString() << "]";
