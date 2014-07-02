@@ -29,7 +29,7 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdComp, IdAnd, IdOr, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdAnd, IdOr, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo };
 
 class Expr
 {
@@ -645,6 +645,52 @@ public:
 		return ss.str();
 	}
 };
+
+
+class MultiOp : public Expr
+{
+protected:
+	Expr first;
+	vector<pair<char, Expr> > list;
+public:
+	MultiOp(Expr _first) :
+		first(_first)
+	{
+
+	}
+
+	virtual ~MultiOp()
+	{
+	}
+
+	MultiOp& add(char op, Expr e)
+	{
+		if((op != '+') && (op != '-') && (op != '*') && (op != '/'))
+		{
+			cout << "ERROR: UNKNOWN OPERATION '" << op << "'" << endl;
+			exit(1);
+		}
+		list.push_back(make_pair(op, e));
+		return *this;
+	}
+
+	virtual Id id() const
+	{
+		return IdMultiOp;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPMultiOp(SIZE=" << list.size() << "; " << first.toString();
+		for(unsigned i=0; i<list.size(); i++)
+			ss << " " << list[i].first << " " << list[i].second.toString();
+		ss << " ) ";
+		
+		return ss.str();
+	}
+};
+
 
 
 class Comp : public Expr
