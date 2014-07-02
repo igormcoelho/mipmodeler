@@ -11,16 +11,7 @@
 #include "MIPModel.h"
 #include "MIPVarArray.h"
 
-#include "EMIPModel.h"
-
 using namespace std;
-
-
-EMIP::Model knapsack()
-{
-	
-}
-
 
 
 int main()
