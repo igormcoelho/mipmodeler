@@ -25,11 +25,21 @@ namespace EMIP
 
 const double Inf = numeric_limits<double>::infinity();
 
-enum ProblemType { Minimize, Maximize };
+enum ProblemType
+{
+	Minimize, Maximize
+};
 
-enum VarType { Real, Binary, Integer, Unknown }; // (?)
+enum VarType
+{
+	Real, Binary, Integer, Unknown
+};
+// (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse };
+enum Id
+{
+	IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse
+};
 
 class Expr
 {
@@ -43,6 +53,8 @@ public:
 
 	virtual string toString() const = 0;
 
+	virtual string toLatex() const = 0;
+
 	virtual void print() const
 	{
 		std::cout << toString() << std::endl;
@@ -51,14 +63,13 @@ public:
 	virtual Expr& clone() const = 0;
 };
 
-
-class Num : public Expr
+class Num: public Expr
 {
 protected:
 	double d;
 public:
 	Num(double _d) :
-		d(_d)
+			d(_d)
 	{
 	}
 
@@ -78,14 +89,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << d;
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
-		return * new Num(d);
+		return *new Num(d);
 	}
 };
 
-
-class Var : public Expr
+class Var: public Expr
 {
 protected:
 	VarType type;
@@ -93,7 +110,7 @@ protected:
 public:
 
 	Var(string _name, VarType _type = Unknown) :
-		type(_type), name(_name)
+			type(_type), name(_name)
 	{
 	}
 
@@ -149,6 +166,13 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name;
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return cloneVar();
@@ -156,18 +180,18 @@ public:
 
 	virtual Var& cloneVar() const
 	{
-		return * new Var(name, type);
+		return *new Var(name, type);
 	}
 };
 
-class Var1Index : public Var
+class Var1Index: public Var
 {
 protected:
 	Expr& i1;
 public:
 
-	Var1Index(string _name, const Expr&  _i1, VarType _type = Unknown) :
-		Var(_name, _type), i1(_i1.clone())
+	Var1Index(string _name, const Expr& _i1, VarType _type = Unknown) :
+			Var(_name, _type), i1(_i1.clone())
 	{
 	}
 
@@ -198,21 +222,28 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Var& cloneVar() const
 	{
-		return * new Var1Index(name, i1, type);
+		return *new Var1Index(name, i1, type);
 	}
 };
 
-class Var2Index : public Var
+class Var2Index: public Var
 {
 protected:
 	Expr& i1;
 	Expr& i2;
 public:
 
-	Var2Index(string _name, const Expr&  _i1, const Expr&  _i2, VarType _type = Unknown) :
-		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone())
+	Var2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Unknown) :
+			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
 
@@ -243,13 +274,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Var& cloneVar() const
 	{
-		return * new Var2Index(name, i1, i2, type);
+		return *new Var2Index(name, i1, i2, type);
 	}
 };
 
-class Var3Index : public Var
+class Var3Index: public Var
 {
 protected:
 	Expr& i1;
@@ -258,7 +296,7 @@ protected:
 public:
 
 	Var3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Unknown) :
-		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
+			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
 
@@ -290,14 +328,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Var& cloneVar() const
 	{
-		return * new Var3Index(name, i1, i2, i3, type);
+		return *new Var3Index(name, i1, i2, i3, type);
 	}
 };
 
-
-class Var4Index : public Var
+class Var4Index: public Var
 {
 protected:
 	Expr& i1;
@@ -307,7 +351,7 @@ protected:
 public:
 
 	Var4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Unknown) :
-		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
+			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
 
@@ -340,14 +384,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Var& cloneVar() const
 	{
-		return * new Var4Index(name, i1, i2, i3, i4, type);
+		return *new Var4Index(name, i1, i2, i3, i4, type);
 	}
 };
 
-
-class Var5Index : public Var
+class Var5Index: public Var
 {
 protected:
 	Expr& i1;
@@ -357,8 +407,8 @@ protected:
 	Expr& i5;
 public:
 
-	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Unknown) :
-		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
+	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, const Expr& _i5, VarType _type = Unknown) :
+			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
 
@@ -392,14 +442,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << i5.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Var& cloneVar() const
 	{
-		return * new Var5Index(name, i1, i2, i3, i4, i5, type);
+		return *new Var5Index(name, i1, i2, i3, i4, i5, type);
 	}
 };
 
-
-class Par : public Expr
+class Par: public Expr
 {
 protected:
 	VarType type;
@@ -407,7 +463,7 @@ protected:
 public:
 
 	Par(string _name, VarType _type = Unknown) :
-		type(_type), name(_name)
+			type(_type), name(_name)
 	{
 	}
 
@@ -463,20 +519,27 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name;
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
-		return * new Par(name, type);
+		return *new Par(name, type);
 	}
 };
 
-class Par1Index : public Par
+class Par1Index: public Par
 {
 protected:
 	Expr& i1;
 public:
 
 	Par1Index(string _name, const Expr& _i1, VarType _type = Unknown) :
-		Par(_name, _type), i1(_i1.clone())
+			Par(_name, _type), i1(_i1.clone())
 	{
 	}
 
@@ -507,13 +570,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Par1Index(name, i1, type);
 	}
 };
 
-class Par2Index : public Par
+class Par2Index: public Par
 {
 protected:
 	Expr& i1;
@@ -521,7 +591,7 @@ protected:
 public:
 
 	Par2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Unknown) :
-		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone())
+			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
 
@@ -552,13 +622,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Par2Index(name, i1, i2, type);
 	}
 };
 
-class Par3Index : public Par
+class Par3Index: public Par
 {
 protected:
 	Expr& i1;
@@ -567,7 +644,7 @@ protected:
 public:
 
 	Par3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Unknown) :
-		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
+			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
 
@@ -599,14 +676,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Par3Index(name, i1, i2, i3, type);
 	}
 };
 
-
-class Par4Index : public Par
+class Par4Index: public Par
 {
 protected:
 	Expr& i1;
@@ -616,7 +699,7 @@ protected:
 public:
 
 	Par4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Unknown) :
-		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
+			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
 
@@ -649,14 +732,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Par4Index(name, i1, i2, i3, i4, type);
 	}
 };
 
-
-class Par5Index : public Par
+class Par5Index: public Par
 {
 protected:
 	Expr& i1;
@@ -666,8 +755,8 @@ protected:
 	Expr& i5;
 public:
 
-	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Unknown) :
-		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
+	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, const Expr& _i5, VarType _type = Unknown) :
+			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
 
@@ -701,21 +790,29 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << "," << i5.toLatex() << "}";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Par5Index(name, i1, i2, i3, i4, i5, type);
 	}
 };
 
-class Op : public Expr
+class Op: public Expr
 {
 protected:
 	char op;
 	Expr& e1;
 	Expr& e2;
+
 public:
 	Op(const Expr& _e1, char _op, const Expr& _e2) :
-		e1(_e1.clone()), op(_op), e2(_e2.clone())
+			e1(_e1.clone()), op(_op), e2(_e2.clone())
 	{
 		if((op != '+') && (op != '-') && (op != '*') && (op != '/'))
 		{
@@ -740,28 +837,34 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\left(" << e1.toLatex() << " " << op << " " << e2.toLatex() << "\\right)";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Op(e1, op, e2);
 	}
 };
 
-
-class MultiOp : public Expr
+class MultiOp: public Expr
 {
 protected:
 	Expr& first;
 	vector<pair<char, Expr*> > list;
 public:
 	MultiOp(const Expr& _first) :
-		first(_first.clone())
+			first(_first.clone())
 	{
 	}
 
 	MultiOp(const MultiOp& mop) :
-		first(mop.first.clone())
+			first(mop.first.clone())
 	{
-		for(unsigned i=0; i<mop.list.size(); ++i)
+		for(unsigned i = 0; i < mop.list.size(); ++i)
 			list.push_back(make_pair(mop.list[i].first, &mop.list[i].second->clone()));
 	}
 
@@ -789,10 +892,20 @@ public:
 	{
 		stringstream ss;
 		ss << "EMIPMultiOp(SIZE=" << list.size() << "; " << first.toString();
-		for(unsigned i=0; i<list.size(); i++)
+		for(unsigned i = 0; i < list.size(); i++)
 			ss << " " << list[i].first << " " << list[i].second->toString();
 		ss << " ) ";
-		
+
+		return ss.str();
+	}
+
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\left(" << first.toLatex() << " ";
+		for(unsigned i = 0; i < list.size(); ++i)
+			ss << list[i].first << " " << list[i].second->toLatex() << " ";
+		ss << "\\right)";
 		return ss.str();
 	}
 
@@ -801,7 +914,6 @@ public:
 		return *new MultiOp(*this);
 	}
 };
-
 
 class Bool
 {
@@ -827,15 +939,18 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		return "";
+	}
+
 	virtual Bool& clone() const
 	{
-		return * new Bool;
+		return *new Bool;
 	}
 };
 
-
-
-class Comp : public Bool
+class Comp: public Bool
 {
 protected:
 	string op;
@@ -844,7 +959,7 @@ protected:
 public:
 
 	Comp(const Expr& _e1, string _op, const Expr& _e2) :
-		e1(_e1.clone()), op(_op), e2(_e2.clone())
+			e1(_e1.clone()), op(_op), e2(_e2.clone())
 	{
 		if((op != "!=") && (op != "=") && (op != ">") && (op != "<"))
 		{
@@ -869,6 +984,13 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\left(" << e1.toLatex() << " " << op << e2.toLatex() << " \\right) ";
+		return ss.str();
+	}
+
 	virtual Bool& clone() const
 	{
 		return cloneComp();
@@ -880,10 +1002,7 @@ public:
 	}
 };
 
-
-
-
-class Not : public Bool
+class Not: public Bool
 {
 protected:
 	Bool& e1;
@@ -891,7 +1010,7 @@ protected:
 public:
 
 	Not(const Bool& _e1) :
-		e1(_e1.clone())
+			e1(_e1.clone())
 	{
 	}
 
@@ -910,10 +1029,16 @@ public:
 		ss << "EMIPNot(" << e1.toString() << ") ";
 		return ss.str();
 	}
+
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "not(" << e1.toLatex() << ")";
+		return ss.str();
+	}
 };
 
-
-class BoolOp : public Bool
+class BoolOp: public Bool
 {
 protected:
 	Comp& e1;
@@ -922,9 +1047,9 @@ protected:
 public:
 
 	BoolOp(Comp& _e1, string _op, Comp& _e2) :
-		e1(_e1), op(_op), e2(_e2)
+			e1(_e1), op(_op), e2(_e2)
 	{
-		if((op != "&&") && (op != "||"))
+		if((op != "and") && (op != "or"))
 		{
 			cout << "ERROR! UNKNOWN BoolOp '" << op << "'" << endl;
 			exit(1);
@@ -946,9 +1071,14 @@ public:
 		ss << "EMIPBoolOp(" << e1.toString() << " " << op << " " << e2.toString() << ") ";
 		return ss.str();
 	}
+
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\left(" << e1.toLatex() << " " << op << e2.toLatex() << " \\right) ";
+		return ss.str();
+	}
 };
-
-
 
 class Set
 {
@@ -958,7 +1088,7 @@ protected:
 public:
 
 	Set(string _name) :
-		name(_name)
+			name(_name)
 	{
 	}
 
@@ -978,14 +1108,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << name << " ";
+		return ss.str();
+	}
+
 	virtual Set& clone() const
 	{
-		return * new Set(name);
+		return *new Set(name);
 	}
 };
 
-
-class SetElem : public Set
+class SetElem: public Set
 {
 protected:
 	Expr& elem;
@@ -993,7 +1129,7 @@ protected:
 public:
 
 	SetElem(const Expr& _elem) :
-		Set(""), elem(_elem.clone())
+			Set(""), elem(_elem.clone())
 	{
 	}
 
@@ -1013,13 +1149,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\{" << elem.toLatex() << " \\} ";
+		return ss.str();
+	}
+
 	virtual Set& clone() const
 	{
-		return * new SetElem(elem);
+		return *new SetElem(elem);
 	}
 };
 
-class SetCard : public Expr
+class SetCard: public Expr
 {
 protected:
 	Set& s1;
@@ -1027,7 +1170,7 @@ protected:
 public:
 	// cardinality
 	SetCard(const Set& _s1) :
-		s1(_s1.clone())
+			s1(_s1.clone())
 	{
 	}
 
@@ -1047,15 +1190,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "|" << s1.toLatex() << "|";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
-		return * new SetCard(s1);
+		return *new SetCard(s1);
 	}
 };
 
-
-
-class SetOp : public Set
+class SetOp: public Set
 {
 protected:
 	Set& s1;
@@ -1065,7 +1213,7 @@ protected:
 public:
 
 	SetOp(const Set& _s1, string _op, const Set& _s2) :
-		Set(""), s1(_s1.clone()), op(_op), s2(_s2.clone())
+			Set(""), s1(_s1.clone()), op(_op), s2(_s2.clone())
 	{
 		if((op != "U") && (op != "-") && (op != "\\") && (op != "C") && (op != "C="))
 		{
@@ -1090,22 +1238,38 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\left(" << s1.toLatex() << " ";
+		if(op == "U")
+			ss << "\\cup ";
+		else if(op == "-")
+			ss << "- ";
+		else if(op == "\\")
+			ss << "\\setminus ";
+		else if(op == "C")
+			ss << "\\subset ";
+		else if(op == "C=")
+			ss << "\\subseteq ";
+		ss << s2.toLatex() << " \\right) ";
+		return ss.str();
+	}
+
 	virtual Set& clone() const
 	{
-		return * new SetOp(s1, op, s2);
+		return *new SetOp(s1, op, s2);
 	}
 };
 
-
-
-class Sum : public Expr
+class Sum: public Expr
 {
 protected:
 	Expr& body;
 
 public:
 	Sum(const Expr& _body) :
-		body(_body.clone())
+			body(_body.clone())
 	{
 	}
 
@@ -1118,18 +1282,14 @@ public:
 		return IdSum;
 	}
 
-	virtual string toString() const
-	{
-		stringstream ss;
-		ss << "EMIPSum({" << body.toString() << "}) ";
-		return ss.str();
-	}
+	virtual string toString() const = 0;
+
+	virtual string toLatex() const = 0;
 
 	virtual Expr& clone() const = 0;
 };
 
-
-class SumIn : public Sum
+class SumIn: public Sum
 {
 protected:
 	Var& v;
@@ -1138,12 +1298,12 @@ protected:
 
 public:
 	SumIn(const Var& _v, const Set& _s, const Expr& body) :
-		Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(* new Bool)
+			Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(*new Bool)
 	{
 	}
 
 	SumIn(const Var& _v, const Set& _s, const Expr& body, const Bool& _st) :
-		Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
+			Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1163,14 +1323,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\sum_{" << v.toLatex() << " \\in " << s.toLatex() << "}^{}{" << body.toLatex() << "} ";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
-		return * new SumIn(v, s, body, st);
+		return *new SumIn(v, s, body, st);
 	}
 };
 
-
-class SumTo : public Sum
+class SumTo: public Sum
 {
 protected:
 	Var& v;
@@ -1179,12 +1345,12 @@ protected:
 	Bool& st; // such that
 public:
 	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body) :
-		Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(* new Bool)
+			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Bool)
 	{
 	}
 
 	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Bool& _st) :
-		Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
+			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -1204,12 +1370,18 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\sum_{" << v.toLatex() << " = " << begin.toLatex() << "}^{" << end.toLatex() << "}{" << body.toLatex() << "} ";
+		return ss.str();
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new SumTo(v, begin, end, body, st);
 	}
 };
-
 
 class ForAll
 {
@@ -1235,14 +1407,18 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		return "";
+	}
+
 	virtual ForAll& clone() const
 	{
-		return * new ForAll;
+		return *new ForAll;
 	}
 };
 
-
-class ForAllIn : public ForAll
+class ForAllIn: public ForAll
 {
 protected:
 	Var& v;
@@ -1250,12 +1426,12 @@ protected:
 	Bool& st; // such that
 public:
 	ForAllIn(const Var& _v, const Set& _s) :
-		v(_v.cloneVar()), s(_s.clone()), st(* new Bool)
+			v(_v.cloneVar()), s(_s.clone()), st(*new Bool)
 	{
 	}
 
 	ForAllIn(const Var& _v, const Set& _s, const Bool& _st) :
-		v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
+			v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1275,14 +1451,22 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\forall " << v.toLatex() << " \\in " << s.toLatex();
+		if(st.id() != IdBool)
+			ss << "|" << st.toLatex() << " ";
+		return ss.str();
+	}
+
 	virtual ForAll& clone() const
 	{
-		return * new ForAllIn(v, s, st);
+		return *new ForAllIn(v, s, st);
 	}
 };
 
-
-class ForAllTo : public ForAll
+class ForAllTo: public ForAll
 {
 protected:
 	Var& v;
@@ -1291,12 +1475,12 @@ protected:
 	Bool& st; // such that
 public:
 	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end) :
-		v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(* new Bool)
+			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Bool)
 	{
 	}
 
 	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end, const Bool& _st) :
-		v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
+			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -1316,12 +1500,20 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "\\forall " << v.toLatex() << " = " << begin.toLatex() << " to " << end.toLatex() << " ";
+		if(st.id() != IdBool)
+			ss << "|" << st.toLatex() << " ";
+		return ss.str();
+	}
+
 	virtual ForAll& clone() const
 	{
-		return * new ForAllTo(v, begin, end, st);
+		return *new ForAllTo(v, begin, end, st);
 	}
 };
-
 
 class Cons
 {
@@ -1333,15 +1525,14 @@ protected:
 public:
 
 	Cons(const Expr& _lhs, char _signal, const Expr& _rhs) :
-		fa(* new ForAll), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
+			fa(*new ForAll), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
 	{
 	}
 
 	Cons(const ForAll& _fa, const Expr& _lhs, char _signal, const Expr& _rhs) :
-		fa(_fa.clone()), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
+			fa(_fa.clone()), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
 	{
 	}
-
 
 	virtual ~Cons()
 	{
@@ -1359,13 +1550,27 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << lhs.toLatex() << " ";
+		if(signal == '=')
+			ss << "=";
+		else if(signal == '<')
+			ss << "\\leq";
+		else if(signal == '>')
+			ss << "\\geq";
+
+		ss << " & " << rhs.toLatex() << " & " << fa.toLatex() << " \\\\";
+
+		return ss.str();
+	}
+
 	virtual Cons& clone() const
 	{
-		return * new Cons(fa, lhs, signal, rhs);
+		return *new Cons(fa, lhs, signal, rhs);
 	}
 };
-
-
 
 class IfElse
 {
@@ -1375,7 +1580,7 @@ protected:
 	vector<Cons*> velse;
 public:
 	IfElse(const Bool& _condition) :
-		condition(_condition.clone())
+			condition(_condition.clone())
 	{
 	}
 
@@ -1404,18 +1609,16 @@ public:
 	{
 		stringstream ss;
 		ss << "EMIPIfElse(if(" << condition.toString() << ") { ";
-		for(unsigned i=0; i<vif.size(); i++)
+		for(unsigned i = 0; i < vif.size(); i++)
 			ss << vif[i]->toString() << " ";
 		ss << " } else { " << endl;
-		for(unsigned i=0; i<velse.size(); i++)
+		for(unsigned i = 0; i < velse.size(); i++)
 			ss << vif[i]->toString() << " ";
 		ss << " } ";
 
 		return ss.str();
 	}
 };
-
-
 
 class Model
 {
@@ -1442,7 +1645,7 @@ public:
 	}
 
 	Model(ProblemType _type, const Expr& _obj) :
-		type(_type), obj(&_obj.clone())
+			type(_type), obj(&_obj.clone())
 	{
 	}
 
@@ -1474,10 +1677,40 @@ public:
 			ss << "Minimize";
 		else
 			ss << "Maximize";
+
+		if(!obj)
+		{
+			ss << " !NO-OBJECTIVE)";
+			return ss.str();
+		}
+
 		ss << " { " << obj->toString() << "} subject to: {" << endl;
-		for(unsigned i=0; i<constraints.size(); ++i)
+		for(unsigned i = 0; i < constraints.size(); ++i)
 			ss << constraints[i]->toString() << endl;
 		ss << "})";
+
+		return ss.str();
+	}
+
+	virtual string toLatex() const
+	{
+		if(!obj)
+			return "";
+
+		stringstream ss;
+		ss << "\\begin{equation}\n";
+
+		if(type == Minimize)
+			ss << "min: ";
+		else
+			ss << "max: ";
+		ss << obj->toLatex() << "\n";
+		ss << "\\end{equation}\n\n";
+
+		ss << "\\begin{align}\n";
+		for(unsigned i = 0; i < constraints.size(); ++i)
+					ss << constraints[i]->toLatex() << endl;
+		ss << "\\end{align}\n";
 
 		return ss.str();
 	}
@@ -1489,7 +1722,7 @@ public:
 
 	virtual Model& clone() const
 	{
-		return * new Model(*this);
+		return *new Model(*this);
 	}
 };
 
@@ -1503,8 +1736,6 @@ typedef const Cons& CONS;
 typedef const Model& MODEL;
 
 }
-
-
 
 #endif
 

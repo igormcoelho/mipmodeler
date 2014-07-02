@@ -26,6 +26,8 @@ Model& knapsack()
 
 	mk.setObj(sumObj);
 
+	cout << sumObj.toLatex() << endl;
+
 	// --------------
 
 	EXPR sumC1 = SumIn(vi, Set("I"), Op(Par1Index("w", vi), '*', Var1Index("x", vi)));
@@ -42,6 +44,7 @@ int main()
 {
     Model& mk = knapsack();
     mk.print();
+    cout << mk.toLatex() << endl;
 
     cout << "Finished successfully!" << endl;
 
