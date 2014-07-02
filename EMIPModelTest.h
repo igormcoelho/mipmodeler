@@ -29,7 +29,7 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdNum, IdOp, IdComp, IdAnd, IdOr };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdNum, IdOp, IdComp, IdAnd, IdOr };
 
 class Expr
 {
@@ -179,6 +179,173 @@ public:
 	}
 };
 
+class Var2Index : public Var
+{
+protected:
+	Expr i1;
+	Expr i2;
+public:
+
+	Var2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2)
+	{
+	}
+
+	virtual ~Var2Index()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdVar2Index;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPVar2Index(";
+		if(isInteger())
+			ss << "Integer";
+		else if(isBinary())
+			ss << "Binary";
+		else
+			ss << "Real";
+		ss << ",'" << name << "')";
+		ss << "[" << i1.toString() << "]";
+		ss << "[" << i2.toString() << "] ";
+		return ss.str();
+	}
+};
+
+class Var3Index : public Var
+{
+protected:
+	Expr i1;
+	Expr i2;
+	Expr i3;
+public:
+
+	Var3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3)
+	{
+	}
+
+	virtual ~Var3Index()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdVar3Index;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPVar3Index(";
+		if(isInteger())
+			ss << "Integer";
+		else if(isBinary())
+			ss << "Binary";
+		else
+			ss << "Real";
+		ss << ",'" << name << "')";
+		ss << "[" << i1.toString() << "]";
+		ss << "[" << i2.toString() << "]";
+		ss << "[" << i3.toString() << "] ";
+		return ss.str();
+	}
+};
+
+
+class Var4Index : public Var
+{
+protected:
+	Expr i1;
+	Expr i2;
+	Expr i3;
+	Expr i4;
+public:
+
+	Var4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
+	{
+	}
+
+	virtual ~Var4Index()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdVar4Index;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPVar4Index(";
+		if(isInteger())
+			ss << "Integer";
+		else if(isBinary())
+			ss << "Binary";
+		else
+			ss << "Real";
+		ss << ",'" << name << "')";
+		ss << "[" << i1.toString() << "]";
+		ss << "[" << i2.toString() << "]";
+		ss << "[" << i3.toString() << "]";
+		ss << "[" << i4.toString() << "] ";
+		return ss.str();
+	}
+};
+
+
+class Var5Index : public Var
+{
+protected:
+	Expr i1;
+	Expr i2;
+	Expr i3;
+	Expr i4;
+	Expr i5;
+public:
+
+	Var5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
+	{
+	}
+
+	virtual ~Var5Index()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdVar5Index;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPVar5Index(";
+		if(isInteger())
+			ss << "Integer";
+		else if(isBinary())
+			ss << "Binary";
+		else
+			ss << "Real";
+		ss << ",'" << name << "')";
+		ss << "[" << i1.toString() << "]";
+		ss << "[" << i2.toString() << "]";
+		ss << "[" << i3.toString() << "]";
+		ss << "[" << i4.toString() << "]";
+		ss << "[" << i5.toString() << "] ";
+		return ss.str();
+	}
+};
+
+
 class Op : public Expr
 {
 protected:
@@ -311,6 +478,7 @@ public:
 		return ss.str();
 	}
 };
+
 
 }
 
