@@ -29,7 +29,7 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdAnd, IdOr, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo };
 
 class Expr
 {
@@ -734,62 +734,51 @@ public:
 };
 
 
-class And : public Comp
+class BoolOp : public Comp
 {
 protected:
 	Comp e1;
 	Comp e2;
+	string op;
 public:
-	And(Comp _e1, Comp _e2) :
-		e1(_e1), e2(_e2)
+
+	BoolOp(string _op, Comp _e1) :
+		e1(_e1), op(_op)
 	{
+		if((op != "!"))
+		{
+			cout << "ERROR! UNKNOWN BoolOp '" << op << "'" << endl;
+			exit(1);
+		}
 	}
 
-	virtual ~And()
+	BoolOp(Comp _e1, string _op, Comp _e2) :
+		e1(_e1), op(_op), e2(_e2)
+	{
+		if((op != "&&") && (op != "||"))
+		{
+			cout << "ERROR! UNKNOWN BoolOp '" << op << "'" << endl;
+			exit(1);
+		}
+	}
+
+	virtual ~BoolOp()
 	{
 	}
 
 	virtual Id id() const
 	{
-		return IdAnd;
+		return IdBoolOp;
 	}
 
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPAnd(" << e1.toString() << " AND " << e2.toString() << ") ";
+		ss << "EMIPBoolOp(" << e1.toString() << " " << op << " " << e2.toString() << ") ";
 		return ss.str();
 	}
 };
 
-
-class Or : public Comp
-{
-protected:
-	Comp e1;
-	Comp e2;
-public:
-	Or(Comp _e1, Comp _e2) :
-		e1(_e1), e2(_e2)
-	{
-	}
-
-	virtual ~Or()
-	{
-	}
-
-	virtual Id id() const
-	{
-		return IdOr;
-	}
-
-	string toString() const
-	{
-		stringstream ss;
-		ss << "EMIPOr(" << e1.toString() << " OR " << e2.toString() << ") ";
-		return ss.str();
-	}
-};
 
 
 class Set
@@ -842,6 +831,18 @@ protected:
 	Set s2;
 
 public:
+	// cardinality
+	SetOp(string _op, Set _s1) :
+		s1(_s1), op(_op)
+	{
+		if((op != "|"))
+		{
+			cout << "UNKNOWN SET OPERATION '" << op << "'" << endl;
+			exit(1);
+		}
+	}
+
+
 	SetOp(Set _s1, string _op, Set _s2) :
 		s1(_s1), op(_op), s2(_s2)
 	{
