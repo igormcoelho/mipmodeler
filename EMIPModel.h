@@ -44,24 +44,62 @@ enum Id
 class Expr
 {
 public:
+	string exprName;
+
+	Expr(string _exprName = "") :
+			exprName(_exprName)
+	{
+	}
 
 	virtual ~Expr()
 	{
 	}
 
-	virtual Id id() const = 0;
+	virtual Id id() const
+	{
+		return IdExpr;
+	}
 
-	virtual string toString() const = 0;
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "Expr('" << exprName << "') ";
+		return ss.str();
+	}
 
 	// add braces before? (only for Expr classes)
-	virtual string toLatex(bool br = true) const = 0;
+	virtual string toLatex(bool br = true) const
+	{
+		stringstream ss;
+		ss << "\\\\label{eq:" << exprName << "} ";
+		return ss.str();
+	}
 
 	virtual void print() const
 	{
 		std::cout << toString() << std::endl;
 	}
 
-	virtual Expr& clone() const = 0;
+	virtual Expr& clone() const
+	{
+		return *new Expr(exprName);
+	}
+
+	static string merge(const Expr& e1, const Expr& e2)
+	{
+		if((e1.exprName != "") && (e2.exprName != ""))
+		{
+			cout << "Expr::merge: ERROR! double names '" << e1.exprName << "' '" << e2.exprName << "'" << endl;
+			exit(1);
+			return "";
+		}
+		else if(e1.exprName != "")
+			return e1.exprName;
+		else if(e2.exprName != "")
+			return e2.exprName;
+		else
+			return "";
+	}
 };
 
 class Num: public Expr
@@ -1739,8 +1777,8 @@ public:
 		ss << "\\end{equation}\n\n";
 
 		ss << "\\begin{align}\n";
-		for(int i = 0; i < ((int)constraints.size()); ++i)
-			ss << constraints[i]->toLatex(i != ((int)constraints.size())-1) << endl;
+		for(int i = 0; i < ((int) constraints.size()); ++i)
+			ss << constraints[i]->toLatex(i != ((int) constraints.size()) - 1) << endl;
 		ss << "\\end{align}\n";
 
 		return ss.str();
@@ -1754,9 +1792,7 @@ public:
 		ss << "\n\n";
 		ss << "IloExpr objective(env);\n";
 
-
 		ss << "model.add(IloMaximize(env, objective));\n";
-
 
 		return ss.str();
 	}
