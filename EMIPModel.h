@@ -29,7 +29,7 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdComp, IdAnd, IdOr };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdComp, IdAnd, IdOr, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo };
 
 class Expr
 {
@@ -744,6 +744,143 @@ public:
 		return ss.str();
 	}
 };
+
+
+class Set
+{
+protected:
+	string name;
+	Expr unitary;
+
+public:
+
+	// C++ crazy programming reasons...
+	Set()
+	{
+		name = "";
+	}
+
+	Set(string _name) :
+		name(_name)
+	{
+	}
+
+	Set(Expr _un) :
+		name(""), unitary(_un)
+	{
+	}
+
+	virtual ~Set()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSet;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSet('" << name << "' || unitary:{" << unitary.toString() << "}) ";
+		return ss.str();
+	}
+};
+
+
+class SetOp : public Set
+{
+protected:
+	Set s1;
+	string op;
+	Set s2;
+
+public:
+	SetOp(Set _s1, string _op, Set _s2) :
+		s1(_s1), op(_op), s2(_s2)
+	{
+		if((op != "U") && (op != "-") && (op != "\\") && (op != "C") && (op != "C="))
+		{
+			cout << "UNKNOWN SET OPERATION '" << op << "'" << endl;
+			exit(1);
+		}
+	}
+
+	virtual ~SetOp()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSetOp;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSetOp(" << s1.toString() << " " << op << " " << s2.toString() << ") ";
+		return ss.str();
+	}
+};
+
+
+
+class Sum : public Expr
+{
+protected:
+	Expr body;
+public:
+	Sum(Expr _body) :
+		body(_body)
+	{
+	}
+
+	virtual ~Sum()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSum;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSum{" << body.toString() << "} ";
+		return ss.str();
+	}
+};
+
+
+class SumIn : public Sum
+{
+protected:
+	Var v;
+	Set s;
+public:
+	SumIn(Var _v, Set _s, Expr body) :
+		Sum(body), v(_v), s(_s)
+	{
+	}
+
+	virtual ~SumIn()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSumIn;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSumIn(" << v.toString() << " in " << s.toString() << "{" << Sum::body.toString() << "} ";
+		return ss.str();
+	}
+};
+
 
 
 class MIPCons
