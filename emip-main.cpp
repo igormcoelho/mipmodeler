@@ -22,9 +22,17 @@ Model& knapsack()
 
 	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));
 
-	EXPR sum = SumIn(vi, Set("I"), body_obj);
+	EXPR sumObj = SumIn(vi, Set("I"), body_obj);
 
-	mk.setObj(sum);
+	mk.setObj(sumObj);
+
+	// --------------
+
+	EXPR sumC1 = SumIn(vi, Set("I"), Op(Par1Index("w", vi), '*', Var1Index("x", vi)));
+
+	CONS c1 = Cons(sumC1, '<', Par("C"));
+
+	mk.addCons(c1);
 
 	return mk.clone();
 }

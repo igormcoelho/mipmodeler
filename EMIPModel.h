@@ -1332,10 +1332,16 @@ protected:
 	Expr& rhs;
 public:
 
+	Cons(const Expr& _lhs, char _signal, const Expr& _rhs) :
+		fa(* new ForAll), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
+	{
+	}
+
 	Cons(const ForAll& _fa, const Expr& _lhs, char _signal, const Expr& _rhs) :
 		fa(_fa.clone()), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
 	{
 	}
+
 
 	virtual ~Cons()
 	{
