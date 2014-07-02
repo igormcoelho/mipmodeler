@@ -13,32 +13,26 @@
 using namespace std;
 using namespace EMIP;
 
-const Expr& knapsack()
+
+Model& knapsack()
 {
 	Model mk(EMIP::Maximize);
 
-	const Expr& vi = Var("i");
-	vi.print();
+	const Var& vi = Var("i");
 
-	const Expr& p1 = Par1Index("p", Var("i"));
-	p1.print();
+	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));
 
-	const Expr& body_obj = Op(Par1Index("p", Var("i")), '*', Var1Index("x", Var("i")));
-	cout << "first: ";
-	body_obj.print();
+	EXPR sum = SumIn(vi, Set("I"), body_obj);
 
+	mk.setObj(sum);
 
-	//Expr sum = SumIn(Var("i"), Set("S"), body_obj);
-	//mk.setObj(sum);
-	return body_obj;
+	return mk.clone();
 }
 
 
 int main()
 {
-    //EMIP::Model mk = knapsack();
-	const Expr& mk = knapsack();
-	cout << "final: ";
+    Model& mk = knapsack();
     mk.print();
 
     cout << "Finished successfully!" << endl;

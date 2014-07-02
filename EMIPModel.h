@@ -1215,6 +1215,10 @@ class ForAll
 {
 public:
 
+	ForAll()
+	{
+	}
+
 	virtual ~ForAll()
 	{
 	}
@@ -1231,7 +1235,10 @@ public:
 		return ss.str();
 	}
 
-	virtual ForAll& clone() const = 0;
+	virtual ForAll& clone() const
+	{
+		return * new ForAll;
+	}
 };
 
 
@@ -1413,6 +1420,16 @@ protected:
 
 public:
 
+	Model(const Model& model) :
+			type(model.type)
+	{
+		obj = model.obj;
+		if(model.obj)
+			obj = &model.obj->clone();
+		for(unsigned i = 0; i < model.constraints.size(); ++i)
+			constraints.push_back(&model.constraints[i]->clone());
+	}
+
 	Model(ProblemType _type) :
 			type(_type), obj(NULL)
 	{
@@ -1463,8 +1480,15 @@ public:
 	{
 		cout << toString() << endl;
 	}
+
+	virtual Model& clone() const
+	{
+		return * new Model(*this);
+	}
 };
 
+// defining const expression
+typedef const Expr& EXPR;
 
 }
 
