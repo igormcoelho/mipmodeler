@@ -1576,7 +1576,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex(bool br = true) const
+	virtual string toLatex(bool linebreak, int idname) const
 	{
 		stringstream ss;
 		ss << lhs.toLatex(false) << " ";
@@ -1587,7 +1587,9 @@ public:
 		else if(signal == '>')
 			ss << "\\geq";
 
-		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex() << " \\\\";
+		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex() << " \\label{eq:cons" << idname << "} ";
+		if(linebreak)
+			ss << " \\\\";
 
 		return ss.str();
 	}
@@ -1731,12 +1733,13 @@ public:
 			ss << "min: ";
 		else
 			ss << "max: ";
-		ss << obj->toLatex() << "\n";
+		ss << obj->toLatex() << " ";
+		ss << "\\label{eq:objfunc}\n";
 		ss << "\\end{equation}\n\n";
 
 		ss << "\\begin{align}\n";
-		for(unsigned i = 0; i < constraints.size(); ++i)
-			ss << constraints[i]->toLatex() << endl;
+		for(int i = 0; i < ((int)constraints.size()); ++i)
+			ss << constraints[i]->toLatex(i != ((int)constraints.size())-1, i) << endl;
 		ss << "\\end{align}\n";
 
 		return ss.str();
