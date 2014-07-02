@@ -1544,19 +1544,20 @@ public:
 class Cons
 {
 protected:
+	string name;
 	ForAll& fa;
 	Expr& lhs;
 	char signal;
 	Expr& rhs;
 public:
 
-	Cons(const Expr& _lhs, char _signal, const Expr& _rhs) :
-			fa(*new ForAll), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
+	Cons(string _name, const Expr& _lhs, char _signal, const Expr& _rhs) :
+			name(_name), fa(*new ForAll), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
 	{
 	}
 
-	Cons(const ForAll& _fa, const Expr& _lhs, char _signal, const Expr& _rhs) :
-			fa(_fa.clone()), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
+	Cons(string _name, const ForAll& _fa, const Expr& _lhs, char _signal, const Expr& _rhs) :
+			name(_name), fa(_fa.clone()), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
 	{
 	}
 
@@ -1572,11 +1573,11 @@ public:
 	virtual string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPCons(" << fa.toString() << ": " << lhs.toString() << " '" << signal << "' " << rhs.toString() << ") ";
+		ss << "EMIPCons('" << name << "'" << fa.toString() << ": " << lhs.toString() << " '" << signal << "' " << rhs.toString() << ") ";
 		return ss.str();
 	}
 
-	virtual string toLatex(bool linebreak, int idname) const
+	virtual string toLatex(bool linebreak) const
 	{
 		stringstream ss;
 		ss << lhs.toLatex(false) << " ";
@@ -1587,7 +1588,7 @@ public:
 		else if(signal == '>')
 			ss << "\\geq";
 
-		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex() << " \\label{eq:cons" << idname << "} ";
+		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex() << " \\label{eq:" << name << "} ";
 		if(linebreak)
 			ss << " \\\\";
 
@@ -1596,7 +1597,7 @@ public:
 
 	virtual Cons& clone() const
 	{
-		return *new Cons(fa, lhs, signal, rhs);
+		return *new Cons(name, fa, lhs, signal, rhs);
 	}
 };
 
@@ -1721,7 +1722,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex(bool br = true) const
+	virtual string toLatex() const
 	{
 		if(!obj)
 			return "";
@@ -1739,8 +1740,23 @@ public:
 
 		ss << "\\begin{align}\n";
 		for(int i = 0; i < ((int)constraints.size()); ++i)
-			ss << constraints[i]->toLatex(i != ((int)constraints.size())-1, i) << endl;
+			ss << constraints[i]->toLatex(i != ((int)constraints.size())-1) << endl;
 		ss << "\\end{align}\n";
+
+		return ss.str();
+	}
+
+	virtual string toConcert() const
+	{
+		stringstream ss;
+		ss << "IloEnv env;\n";
+		ss << "IloModel model(env)\n";
+		ss << "\n\n";
+		ss << "IloExpr objective(env);\n";
+
+
+		ss << "model.add(IloMaximize(env, objective));\n";
+
 
 		return ss.str();
 	}

@@ -32,7 +32,8 @@ Model& knapsack()
 
 	EXPR sumC1 = SumIn(vi, Set("I"), Op(Par1Index("w", vi), '*', Var1Index("x", vi)));
 
-	CONS c1 = Cons(sumC1, '<', Par("C"));
+	CONS c1 = Cons("c1", sumC1, '<', Par("C"));
+
 
 	mk.addCons(c1);
 
