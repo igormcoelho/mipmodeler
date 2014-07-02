@@ -14,14 +14,19 @@ using namespace std;
 
 EMIP::Model knapsack()
 {
+	EMIP::Model mk(EMIP::Maximize);
+
+	
 
 
+	return mk;
 }
 
 
 int main()
 {
-   
+    EMIP::Model mk = knapsack();
+    mk.print();
 
     cout << "Finished successfully!" << endl;
 

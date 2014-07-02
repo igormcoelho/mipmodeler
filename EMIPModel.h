@@ -1191,8 +1191,19 @@ public:
 	{
 	}
 
+	Model(ProblemType _type) :
+		type(_type)
+	{
+	}
+
 	virtual ~Model()
 	{
+	}
+
+	Model& setObj(Expr _obj)
+	{
+		obj = _obj;
+		return *this;
 	}
 
 	Model& addCons(Cons cons)
@@ -1209,12 +1220,17 @@ public:
 			ss << "Minimize";
 		else
 			ss << "Maximize";
-		ss << " { " << obj.toString() << "} {" << endl;
+		ss << " { " << obj.toString() << "} subject to: {" << endl;
 		for(unsigned i=0; i<constraints.size(); ++i)
 			ss << constraints[i].toString() << endl;
 		ss << "})";
 
 		return ss.str();
+	}
+
+	void print() const
+	{
+		cout << toString() << endl;
 	}
 };
 
