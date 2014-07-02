@@ -11,9 +11,17 @@
 #include "MIPModel.h"
 #include "MIPVarArray.h"
 
-#include "EMIPModelTest.h"
+#include "EMIPModel.h"
 
 using namespace std;
+
+
+EMIP::Model knapsack()
+{
+	
+}
+
+
 
 int main()
 {
@@ -69,3 +77,4 @@ int main()
 
     return 0;
 }
+

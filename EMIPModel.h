@@ -84,10 +84,11 @@ class Var : public Expr
 protected:
 	VarType type;
 	string name;
+	double coef;
 public:
 
-	Var(string _name, VarType _type = Real) :
-		type(_type), name(_name)
+	Var(string _name, VarType _type = Real, double _coef=1.0) :
+		type(_type), name(_name), coef(_coef)
 	{
 	}
 
@@ -103,6 +104,17 @@ public:
 	inline Var& setName(string _name)
 	{
 		name = _name;
+		return *this;
+	}
+
+	inline double getCoef() const
+	{
+		return coef;
+	}
+
+	inline Var& setCoef(double _coef)
+	{
+		coef = _coef;
 		return *this;
 	}
 
@@ -129,7 +141,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar(";
+		ss << "EMIPVar(" << coef << " ";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -148,8 +160,8 @@ protected:
 	Expr i1;
 public:
 
-	Var1Index(string _name, Expr _i1, VarType _type = Real) :
-		Var(_name, _type), i1(_i1)
+	Var1Index(string _name, Expr _i1, VarType _type = Real, double _coef=1.0) :
+		Var(_name, _type, _coef), i1(_i1)
 	{
 	}
 
@@ -165,7 +177,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar1Index(";
+		ss << "EMIPVar1Index(" << coef << " ";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -186,8 +198,8 @@ protected:
 	Expr i2;
 public:
 
-	Var2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2)
+	Var2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real, double _coef=1.0) :
+		Var(_name, _type, _coef), i1(_i1), i2(_i2)
 	{
 	}
 
@@ -203,7 +215,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar2Index(";
+		ss << "EMIPVar2Index(" << coef << " ";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -225,8 +237,8 @@ protected:
 	Expr i3;
 public:
 
-	Var3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3)
+	Var3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real, double _coef=1.0) :
+		Var(_name, _type, _coef), i1(_i1), i2(_i2), i3(_i3)
 	{
 	}
 
@@ -242,7 +254,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar3Index(";
+		ss << "EMIPVar3Index(" << coef << " ";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -267,8 +279,8 @@ protected:
 	Expr i4;
 public:
 
-	Var4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
+	Var4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real, double _coef=1.0) :
+		Var(_name, _type, _coef), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
 	{
 	}
 
@@ -284,7 +296,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar4Index(";
+		ss << "EMIPVar4Index(" << coef << " ";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -311,8 +323,8 @@ protected:
 	Expr i5;
 public:
 
-	Var5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
+	Var5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real, double _coef=1.0) :
+		Var(_name, _type, _coef), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
 	{
 	}
 
@@ -328,7 +340,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar5Index(";
+		ss << "EMIPVar5Index(" << coef << " ";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -1165,401 +1177,49 @@ public:
 
 
 
-class MIPCons
+class Model
 {
 protected:
-	string name;
-	char signal;
-	double rhs;
-	vector<double> coefs;
-	vector<MIPVar*> vars;
+	ProblemType type;
+	Expr obj;
+	vector<Cons> constraints;
 
 public:
 
-	MIPCons(char _signal, double _rhs = 0) :
-		name(""), signal(_signal), rhs(_rhs)
-	{
-
-		if((signal != '<') && (signal != '=') && (signal != '>'))
-		{
-			cout << "MIPCons::error! unknown signal '" << signal << "'" << endl;
-			exit(1);
-		}
-	}
-
-	MIPCons(string _name, char _signal, double _rhs = 0) :
-		name(_name), signal(_signal), rhs(_rhs)
-	{
-		if((signal != '<') && (signal != '=') && (signal != '>'))
-		{
-			cout << "MIPConstraint::error! unknown signal '" << signal << "'" << endl;
-			exit(1);
-		}
-	}
-
-	MIPCons(const MIPCons& cons) :
-		name(cons.name), signal(cons.signal), rhs(cons.rhs), coefs(cons.coefs), vars(cons.vars)
+	Model(ProblemType _type, Expr _obj) :
+		type(_type), obj(_obj)
 	{
 	}
 
-	virtual ~MIPCons()
+	virtual ~Model()
 	{
-		vars.clear();
-		coefs.clear();
 	}
 
-	MIPCons& add(double value)
+	Model& addCons(Cons cons)
 	{
-		rhs -= value;
+		constraints.push_back(cons);
 		return *this;
-	}
-
-	MIPCons& add(double coef, MIPVar& var)
-	{
-		coefs.push_back(coef);
-		vars.push_back(&var);
-
-		return *this;
-	}
-
-	inline string getName() const
-	{
-		return name;
-	}
-
-	inline MIPCons& setName(string _name)
-	{
-		name = _name;
-		return *this;
-	}
-
-	inline unsigned getNumVars() const
-	{
-		return vars.size();
-	}
-
-	inline MIPVar& getVar(unsigned index)
-	{
-		return *vars.at(index);
-	}
-
-	inline double getCoef(unsigned index)
-	{
-		return coefs.at(index);
-	}
-
-	inline char getSignal()
-	{
-		return signal;
-	}
-
-	inline double getRHS()
-	{
-		return rhs;
-	}
-
-	void print() const
-	{
-		cout << toString() << endl;
 	}
 
 	string toString() const
 	{
 		stringstream ss;
-		ss << "MIPCons('" << name << "'): ";
-		for(unsigned i=0; i<coefs.size(); i++)
-			ss << (coefs[i]>=0?'+':' ') << coefs[i] << " " << vars[i]->toString() << " ";
-		ss << signal << " ";
-		ss << rhs;
-		return ss.str();
-	}
-};
-
-
-class MIPModel
-{
-protected:
-	MIPType type;
-	vector<double> coefs;
-	vector<MIPVar*> vars;
-	vector<MIPCons*> constraints;
-
-	int varIdx;
-	int consIdx;
-
-public:
-
-	MIPModel(MIPType _type) :
-		type(_type)
-	{
-		varIdx = 0;
-		consIdx = 0;
-	}
-
-	virtual ~MIPModel()
-	{
-		constraints.clear();
-		coefs.clear();
-		vars.clear();
-	}
-
-	MIPModel& add(double coef, MIPVar& var)
-	{
-		coefs.push_back(coef);
-		vars.push_back(&var);
-
-		// auto naming
-		if(var.getName() == "")
-		{
-			varIdx++;
-			stringstream ss;
-			ss << "var_" << varIdx;
-			var.setName(ss.str());
-		}
-		
-		return *this;
-	}
-
-	MIPModel& add(MIPCons& cons)
-	{
-		constraints.push_back(&cons);
-
-		// auto naming
-		if(cons.getName() == "")
-		{
-			consIdx++;
-			stringstream ss;
-			ss << "cons_" << consIdx;
-			cons.setName(ss.str());
-		}
-
-		// auto naming
-		for(unsigned i=0; i<cons.getNumVars(); i++)
-			if(cons.getVar(i).getName() == "")
-			{
-				varIdx++;
-				stringstream ss;
-				ss << "var_" << varIdx;
-				cons.getVar(i).setName(ss.str());
-			}
-
-		return *this;
-	}
-
-
-	string toString() const
-	{
-		stringstream ss;
-		ss << (type==MIPMinimize?"Minimize":"Maximize") << ": ";
-		for(unsigned i=0; i<coefs.size(); i++)
-			ss << (coefs[i]>=0?'+':' ') << coefs[i] << " " << vars[i]->toString() << " ";
-		ss << endl;
-		ss << "Subject to:" << endl;
-		for(unsigned i=0; i<constraints.size(); i++)
-			ss << constraints[i]->toString() << endl;
-		return ss.str();
-	}
-
-	void print() const
-	{
-		cout << toString() << endl;
-	}
-
-	void writeLP(string filename)
-	{
-		if(vars.size() == 0)
-			return;
-		if(constraints.size() == 0)
-			return;
-
-		vector<MIPVar*> vbin;
-		vector<MIPVar*> vreal;
-		vector<MIPVar*> vint;
-
-		const int LINE_BASE_OBJ  = 6;
-		const int LINE_SIZE_OBJ  = 45;
-		const int LINE_BASE_CONS = 29;
-		const int LINE_SIZE_CONS = 60;
-
-		FILE* f = fopen(filename.c_str(), "w");
-		fprintf(f, "\\ENCODING=ISO-8859-1\n\\Problem name: \n%s\n obj: ", (type==MIPMinimize?"Minimize":"Maximize")); 
-
-		addUniqueByType(vars[0], vbin, vint, vreal);
-		string var1 = formatLPVar(coefs[0], vars[0]->getName(), false);
-		fprintf(f, "%s", var1.c_str());
-		int countCharObj = var1.length();
-		for(unsigned v=1; v<vars.size(); v++)
-		{
-			addUniqueByType(vars[v], vbin, vint, vreal);
-			string var_v = formatLPVar(coefs[v], vars[v]->getName(), true);
-			fprintf(f, " %s", var_v.c_str());
-			countCharObj += var_v.length();
-			if(countCharObj >= LINE_SIZE_OBJ)
-			{
-				fprintf(f, "\n");
-				for(int i=0; i<LINE_BASE_OBJ; i++)
-					fprintf(f, " ");
-				countCharObj = 0;
-			}
-		}
-
-		if(countCharObj != 0)
-			fprintf(f, "\n");
-
-		fprintf(f, "Subject To\n");
-
-		for(unsigned c=0; c<constraints.size(); c++)
-		{
-			string cname = constraints[c]->getName();
-			fprintf(f, " %s:", cname.c_str());
-
-			for(int i=0; i<LINE_BASE_CONS-2-cname.length(); i++)
-				fprintf(f, " ");
-
-			addUniqueByType(&constraints[c]->getVar(0), vbin, vint, vreal);
-			string var1 = formatLPVar(constraints[c]->getCoef(0), constraints[c]->getVar(0).getName(), false);
-			fprintf(f, "%s", var1.c_str());
-			int countCharObj = var1.length();
-			for(unsigned v=1; v<constraints[c]->getNumVars(); v++)
-			{
-				addUniqueByType(&constraints[c]->getVar(v), vbin, vint, vreal);
-				string var_v = formatLPVar(constraints[c]->getCoef(v), constraints[c]->getVar(v).getName(), true);
-				fprintf(f, " %s", var_v.c_str());
-				countCharObj += var_v.length();
-				if(countCharObj >= LINE_SIZE_CONS)
-				{
-					fprintf(f, "\n");
-					for(int i=0; i<LINE_BASE_CONS; i++)
-						fprintf(f, " ");
-					countCharObj = 0;
-				}
-			}
-
-			stringstream ssrhs;
-			ssrhs << " " << constraints[c]->getSignal() << (constraints[c]->getSignal()=='='?"":"=") << " " << constraints[c]->getRHS() << endl;
-			fprintf(f, "%s", ssrhs.str().c_str());
-		}
-
-		fprintf(f, "Bounds\n");
-
-		std::sort(vbin.begin(), vbin.end(), orderName);
-		std::sort(vint.begin(), vint.end(), orderName);
-		std::sort(vreal.begin(), vreal.end(), orderName);
-
-		for(unsigned i=0; i<vbin.size(); i++)
-			fprintf(f, "%s\n", printBound(*vbin[i]).c_str());
-		for(unsigned i=0; i<vint.size(); i++)
-			fprintf(f, "%s\n", printBound(*vint[i]).c_str());
-		for(unsigned i=0; i<vreal.size(); i++)
-			fprintf(f, "%s\n", printBound(*vreal[i]).c_str());
-		if(vbin.size() > 0)
-		{
-			fprintf(f, "Binaries\n");
-			const int CHAR_LIMIT = 69;
-			int countChar = 0;
-			for(unsigned i=0; i<vbin.size(); i++)
-			{
-				string var = vbin[i]->getName();
-				fprintf(f, " %s", var.c_str()); 
-				countChar += var.length();
-				if(countChar >= CHAR_LIMIT)
-				{
-					countChar = 0;
-					fprintf(f, "\n");
-				}
-			}
-			if(countChar != 0)
-				fprintf(f, "\n");
-		}
-		if(vint.size() > 0)
-		{
-			fprintf(f, "Generals\n");
-			const int CHAR_LIMIT = 69;
-			int countChar = 0;
-			for(unsigned i=0; i<vint.size(); i++)
-			{
-				string var = vint[i]->getName();
-				fprintf(f, " %s", var.c_str()); 
-				countChar += var.length();
-				if(countChar >= CHAR_LIMIT)
-				{
-					countChar = 0;
-					fprintf(f, "\n");
-				}
-			}
-			if(countChar != 0)
-				fprintf(f, "\n");
-		}
-		fprintf(f, "End\n");
-
-		fclose(f);
-	}
-
-private:
-	inline string formatLPVar(const double& coef, const string& varName, bool signal)
-	{
-		if(coef == 0)
-			return "";
-
-		stringstream ss;
-		if(signal)
-			ss << (coef>=0?"+":"-") << " " << myabs(coef) << " " << varName;
+		ss << "EMIPModel(";
+		if(type == Minimize)
+			ss << "Minimize";
 		else
-			ss << (coef>=0?"":"-")  << " " << myabs(coef) << " " << varName;
-		return ss.str();
-	}
-
-	double myabs(double x)
-	{
-		if(x < 0)
-			return -1*x;
-		return x;
-	}
-
-	void addUniqueByType(MIPVar* var, vector<MIPVar*>& vBinary, vector<MIPVar*>& vInteger, vector<MIPVar*>& vReal)
-	{
-		if(var->isInteger())
-			addUnique(var, vInteger);
-		else if(var->isBinary())
-			addUnique(var, vBinary);
-		else
-			addUnique(var, vReal);
-	}
-
-	void addUnique(MIPVar* var, vector<MIPVar*>& v)
-	{
-		for(unsigned i=0; i<v.size(); i++)
-			if(v[i]->getName() == var->getName())
-				return;
-		v.push_back(var);
-	}
-
-	static bool orderName(const MIPVar* v1, const MIPVar* v2)
-	{
-		return v1->getName() < v2->getName();
-	}
-
-	string printBound(MIPVar& var)
-	{
-		stringstream ss;
-		if(var.getLowerBound() == var.getUpperBound())
-			ss << "      " << var.getName() << " = " << var.getLowerBound();
-		else if((var.getLowerBound() != -MIPInf) && (var.getUpperBound() != MIPInf))
-			ss << " " << var.getLowerBound() << " <= " << var.getName() << " <= " << var.getUpperBound();
-		else if(var.getUpperBound() == MIPInf)
-			ss << "      " << var.getName() << " >= " << var.getLowerBound();
-		else
-		{
-			cout << "ERROR! DONT KNOW HOW TO PRINT VARIABLE: " << var.toString() << endl;
-			exit(1);
-		}
+			ss << "Maximize";
+		ss << " { " << obj.toString() << "} {" << endl;
+		for(unsigned i=0; i<constraints.size(); ++i)
+			ss << constraints[i].toString() << endl;
+		ss << "})";
 
 		return ss.str();
 	}
 };
 
 
-
+}
 
 
 
