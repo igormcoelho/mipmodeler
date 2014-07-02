@@ -29,27 +29,28 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse };
 
 class Expr
 {
 public:
 
-	virtual Id id() const
+	virtual ~Expr()
 	{
-		return IdExpr;
 	}
 
-	virtual string toString() const
-	{
-		return "IdExpr ";
-	}
+	virtual Id id() const = 0;
+
+	virtual string toString() const = 0;
 
 	virtual void print() const
 	{
 		std::cout << toString() << std::endl;
 	}
+
+	virtual Expr& clone() const = 0;
 };
+
 
 class Num : public Expr
 {
@@ -70,11 +71,16 @@ public:
 		return IdNum;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPNum(" << d << ")";
 		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return * new Num(d);
 	}
 };
 
@@ -126,7 +132,7 @@ public:
 		return IdVar;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPVar(";
@@ -140,16 +146,26 @@ public:
 
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return cloneVar();
+	}
+
+	virtual Var& cloneVar() const
+	{
+		return * new Var(name, type);
+	}
 };
 
 class Var1Index : public Var
 {
 protected:
-	Expr i1;
+	Expr& i1;
 public:
 
-	Var1Index(string _name, Expr _i1, VarType _type = Real) :
-		Var(_name, _type), i1(_i1)
+	Var1Index(string _name, const Expr&  _i1, VarType _type = Real) :
+		Var(_name, _type), i1(_i1.clone())
 	{
 	}
 
@@ -162,7 +178,7 @@ public:
 		return IdVar1Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPVar1Index(";
@@ -177,17 +193,22 @@ public:
 
 		return ss.str();
 	}
+
+	virtual Var& cloneVar() const
+	{
+		return * new Var1Index(name, i1, type);
+	}
 };
 
 class Var2Index : public Var
 {
 protected:
-	Expr i1;
-	Expr i2;
+	Expr& i1;
+	Expr& i2;
 public:
 
-	Var2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2)
+	Var2Index(string _name, const Expr&  _i1, const Expr&  _i2, VarType _type = Real) :
+		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
 
@@ -200,7 +221,7 @@ public:
 		return IdVar2Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPVar2Index(";
@@ -215,18 +236,23 @@ public:
 		ss << "[" << i2.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Var& cloneVar() const
+	{
+		return * new Var2Index(name, i1, i2, type);
+	}
 };
 
 class Var3Index : public Var
 {
 protected:
-	Expr i1;
-	Expr i2;
-	Expr i3;
+	Expr& i1;
+	Expr& i2;
+	Expr& i3;
 public:
 
-	Var3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3)
+	Var3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Real) :
+		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
 
@@ -239,7 +265,7 @@ public:
 		return IdVar3Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPVar3Index(";
@@ -255,20 +281,25 @@ public:
 		ss << "[" << i3.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Var& cloneVar() const
+	{
+		return * new Var3Index(name, i1, i2, i3, type);
+	}
 };
 
 
 class Var4Index : public Var
 {
 protected:
-	Expr i1;
-	Expr i2;
-	Expr i3;
-	Expr i4;
+	Expr& i1;
+	Expr& i2;
+	Expr& i3;
+	Expr& i4;
 public:
 
-	Var4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
+	Var4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Real) :
+		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
 
@@ -281,7 +312,7 @@ public:
 		return IdVar4Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPVar4Index(";
@@ -298,21 +329,26 @@ public:
 		ss << "[" << i4.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Var& cloneVar() const
+	{
+		return * new Var4Index(name, i1, i2, i3, i4, type);
+	}
 };
 
 
 class Var5Index : public Var
 {
 protected:
-	Expr i1;
-	Expr i2;
-	Expr i3;
-	Expr i4;
-	Expr i5;
+	Expr& i1;
+	Expr& i2;
+	Expr& i3;
+	Expr& i4;
+	Expr& i5;
 public:
 
-	Var5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real) :
-		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
+	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Real) :
+		Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
 
@@ -325,7 +361,7 @@ public:
 		return IdVar5Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPVar5Index(";
@@ -342,6 +378,11 @@ public:
 		ss << "[" << i4.toString() << "]";
 		ss << "[" << i5.toString() << "] ";
 		return ss.str();
+	}
+
+	virtual Var& cloneVar() const
+	{
+		return * new Var5Index(name, i1, i2, i3, i4, i5, type);
 	}
 };
 
@@ -393,7 +434,7 @@ public:
 		return IdPar;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPPar(";
@@ -407,16 +448,21 @@ public:
 
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return * new Par(name, type);
+	}
 };
 
 class Par1Index : public Par
 {
 protected:
-	Expr i1;
+	Expr& i1;
 public:
 
-	Par1Index(string _name, Expr _i1, VarType _type = Real) :
-		Par(_name, _type), i1(_i1)
+	Par1Index(string _name, const Expr& _i1, VarType _type = Real) :
+		Par(_name, _type), i1(_i1.clone())
 	{
 	}
 
@@ -429,7 +475,7 @@ public:
 		return IdPar1Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPPar1Index(";
@@ -444,17 +490,22 @@ public:
 
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return *new Par1Index(name, i1, type);
+	}
 };
 
 class Par2Index : public Par
 {
 protected:
-	Expr i1;
-	Expr i2;
+	Expr& i1;
+	Expr& i2;
 public:
 
-	Par2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real) :
-		Par(_name, _type), i1(_i1), i2(_i2)
+	Par2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Real) :
+		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
 
@@ -467,7 +518,7 @@ public:
 		return IdPar2Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPPar2Index(";
@@ -482,18 +533,23 @@ public:
 		ss << "[" << i2.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return *new Par2Index(name, i1, i2, type);
+	}
 };
 
 class Par3Index : public Par
 {
 protected:
-	Expr i1;
-	Expr i2;
-	Expr i3;
+	Expr& i1;
+	Expr& i2;
+	Expr& i3;
 public:
 
-	Par3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real) :
-		Par(_name, _type), i1(_i1), i2(_i2), i3(_i3)
+	Par3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Real) :
+		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
 
@@ -506,7 +562,7 @@ public:
 		return IdPar3Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPPar3Index(";
@@ -522,20 +578,25 @@ public:
 		ss << "[" << i3.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return *new Par3Index(name, i1, i2, i3, type);
+	}
 };
 
 
 class Par4Index : public Par
 {
 protected:
-	Expr i1;
-	Expr i2;
-	Expr i3;
-	Expr i4;
+	Expr& i1;
+	Expr& i2;
+	Expr& i3;
+	Expr& i4;
 public:
 
-	Par4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real) :
-		Par(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
+	Par4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Real) :
+		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
 
@@ -548,7 +609,7 @@ public:
 		return IdPar4Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPPar4Index(";
@@ -565,21 +626,26 @@ public:
 		ss << "[" << i4.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return *new Par4Index(name, i1, i2, i3, i4, type);
+	}
 };
 
 
 class Par5Index : public Par
 {
 protected:
-	Expr i1;
-	Expr i2;
-	Expr i3;
-	Expr i4;
-	Expr i5;
+	Expr& i1;
+	Expr& i2;
+	Expr& i3;
+	Expr& i4;
+	Expr& i5;
 public:
 
-	Par5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real) :
-		Par(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
+	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4,  const Expr& _i5, VarType _type = Real) :
+		Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
 
@@ -592,7 +658,7 @@ public:
 		return IdPar5Index;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPPar5Index(";
@@ -610,17 +676,22 @@ public:
 		ss << "[" << i5.toString() << "] ";
 		return ss.str();
 	}
+
+	virtual Expr& clone() const
+	{
+		return *new Par5Index(name, i1, i2, i3, i4, i5, type);
+	}
 };
 
 class Op : public Expr
 {
 protected:
 	char op;
-	Expr e1;
-	Expr e2;
+	Expr& e1;
+	Expr& e2;
 public:
-	Op(Expr _e1, char _op, Expr _e2) :
-		e1(_e1), op(_op), e2(_e2)
+	Op(const Expr& _e1, char _op, const Expr& _e2) :
+		e1(_e1.clone()), op(_op), e2(_e2.clone())
 	{
 		if((op != '+') && (op != '-') && (op != '*') && (op != '/'))
 		{
@@ -638,11 +709,16 @@ public:
 		return IdOp;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPOp(" << e1.toString() << " " << op << " " << e2.toString() << ") ";
 		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return *new Op(e1, op, e2);
 	}
 };
 
@@ -650,27 +726,33 @@ public:
 class MultiOp : public Expr
 {
 protected:
-	Expr first;
-	vector<pair<char, Expr> > list;
+	Expr& first;
+	vector<pair<char, Expr*> > list;
 public:
-	MultiOp(Expr _first) :
-		first(_first)
+	MultiOp(const Expr& _first) :
+		first(_first.clone())
 	{
+	}
 
+	MultiOp(const MultiOp& mop) :
+		first(mop.first.clone())
+	{
+		for(unsigned i=0; i<mop.list.size(); ++i)
+			list.push_back(make_pair(mop.list[i].first, &mop.list[i].second->clone()));
 	}
 
 	virtual ~MultiOp()
 	{
 	}
 
-	MultiOp& add(char op, Expr e)
+	MultiOp& add(char op, const Expr& e)
 	{
 		if((op != '+') && (op != '-') && (op != '*') && (op != '/'))
 		{
 			cout << "ERROR: UNKNOWN OPERATION '" << op << "'" << endl;
 			exit(1);
 		}
-		list.push_back(make_pair(op, e));
+		list.push_back(make_pair(op, &e.clone()));
 		return *this;
 	}
 
@@ -679,35 +761,66 @@ public:
 		return IdMultiOp;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPMultiOp(SIZE=" << list.size() << "; " << first.toString();
 		for(unsigned i=0; i<list.size(); i++)
-			ss << " " << list[i].first << " " << list[i].second.toString();
+			ss << " " << list[i].first << " " << list[i].second->toString();
 		ss << " ) ";
 		
 		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return *new MultiOp(*this);
+	}
+};
+
+
+class Bool
+{
+public:
+
+	Bool()
+	{
+	}
+
+	virtual ~Bool()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdBool;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPTrue() ";
+		return ss.str();
+	}
+
+	virtual Bool& clone() const
+	{
+		return * new Bool;
 	}
 };
 
 
 
-class Comp : public Expr
+class Comp : public Bool
 {
 protected:
 	string op;
-	Expr e1;
-	Expr e2;
+	Expr& e1;
+	Expr& e2;
 public:
 
-	// to allow later instantiation of derived classes (strange C++...)
-	Comp()
-	{
-	}
-
-	Comp(Expr _e1, string _op, Expr _e2) :
-		e1(_e1), op(_op), e2(_e2)
+	Comp(const Expr& _e1, string _op, const Expr& _e2) :
+		e1(_e1.clone()), op(_op), e2(_e2.clone())
 	{
 		if((op != "!=") && (op != "=") && (op != ">") && (op != "<"))
 		{
@@ -725,34 +838,66 @@ public:
 		return IdComp;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPComp(" << e1.toString() << " " << op << " " << e2.toString() << ") ";
 		return ss.str();
 	}
+
+	virtual Bool& clone() const
+	{
+		return cloneComp();
+	}
+
+	virtual Comp& cloneComp() const
+	{
+		return *new Comp(e1, op, e2);
+	}
 };
 
 
-class BoolOp : public Comp
+
+
+class Not : public Bool
 {
 protected:
-	Comp e1;
-	Comp e2;
+	Bool& e1;
 	string op;
 public:
 
-	BoolOp(string _op, Comp _e1) :
-		e1(_e1), op(_op)
+	Not(const Bool& _e1) :
+		e1(_e1.clone())
 	{
-		if((op != "!"))
-		{
-			cout << "ERROR! UNKNOWN BoolOp '" << op << "'" << endl;
-			exit(1);
-		}
 	}
 
-	BoolOp(Comp _e1, string _op, Comp _e2) :
+	virtual ~Not()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdNot;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPNot(" << e1.toString() << ") ";
+		return ss.str();
+	}
+};
+
+
+class BoolOp : public Bool
+{
+protected:
+	Comp& e1;
+	Comp& e2;
+	string op;
+public:
+
+	BoolOp(Comp& _e1, string _op, Comp& _e2) :
 		e1(_e1), op(_op), e2(_e2)
 	{
 		if((op != "&&") && (op != "||"))
@@ -771,7 +916,7 @@ public:
 		return IdBoolOp;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPBoolOp(" << e1.toString() << " " << op << " " << e2.toString() << ") ";
@@ -785,23 +930,11 @@ class Set
 {
 protected:
 	string name;
-	Expr unitary;
 
 public:
 
-	// C++ crazy programming reasons...
-	Set()
-	{
-		name = "";
-	}
-
 	Set(string _name) :
 		name(_name)
-	{
-	}
-
-	Set(Expr _un) :
-		name(""), unitary(_un)
 	{
 	}
 
@@ -814,37 +947,101 @@ public:
 		return IdSet;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPSet('" << name << "' || unitary:{" << unitary.toString() << "}) ";
+		ss << "EMIPSet('" << name << "') ";
 		return ss.str();
 	}
+
+	virtual Set& clone() const
+	{
+		return * new Set(name);
+	}
 };
+
+
+class SetElem : public Set
+{
+protected:
+	Expr& elem;
+
+public:
+
+	SetElem(const Expr& _elem) :
+		Set(""), elem(_elem.clone())
+	{
+	}
+
+	virtual ~SetElem()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSetElem;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSetElem({" << elem.toString() << "}) ";
+		return ss.str();
+	}
+
+	virtual Set& clone() const
+	{
+		return * new SetElem(elem);
+	}
+};
+
+class SetCard : public Expr
+{
+protected:
+	Set& s1;
+
+public:
+	// cardinality
+	SetCard(const Set& _s1) :
+		s1(_s1.clone())
+	{
+	}
+
+	virtual ~SetCard()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSetCard;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSetCard(|" << s1.toString() << "|) ";
+		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return * new SetCard(s1);
+	}
+};
+
 
 
 class SetOp : public Set
 {
 protected:
-	Set s1;
+	Set& s1;
 	string op;
-	Set s2;
+	Set& s2;
 
 public:
-	// cardinality
-	SetOp(string _op, Set _s1) :
-		s1(_s1), op(_op)
-	{
-		if((op != "|"))
-		{
-			cout << "UNKNOWN SET OPERATION '" << op << "'" << endl;
-			exit(1);
-		}
-	}
 
-
-	SetOp(Set _s1, string _op, Set _s2) :
-		s1(_s1), op(_op), s2(_s2)
+	SetOp(const Set& _s1, string _op, const Set& _s2) :
+		Set(""), s1(_s1.clone()), op(_op), s2(_s2.clone())
 	{
 		if((op != "U") && (op != "-") && (op != "\\") && (op != "C") && (op != "C="))
 		{
@@ -862,11 +1059,16 @@ public:
 		return IdSetOp;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPSetOp(" << s1.toString() << " " << op << " " << s2.toString() << ") ";
 		return ss.str();
+	}
+
+	virtual Set& clone() const
+	{
+		return * new SetOp(s1, op, s2);
 	}
 };
 
@@ -875,10 +1077,11 @@ public:
 class Sum : public Expr
 {
 protected:
-	Expr body;
+	Expr& body;
+
 public:
-	Sum(Expr _body) :
-		body(_body)
+	Sum(const Expr& _body) :
+		body(_body.clone())
 	{
 	}
 
@@ -891,29 +1094,32 @@ public:
 		return IdSum;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPSum({" << body.toString() << "}) ";
 		return ss.str();
 	}
+
+	virtual Expr& clone() const = 0;
 };
 
 
 class SumIn : public Sum
 {
 protected:
-	Var v;
-	Set s;
-	Comp st; // such that
+	Var& v;
+	Set& s;
+	Bool& st; // such that
+
 public:
-	SumIn(Var _v, Set _s, Expr body) :
-		Sum(body), v(_v), s(_s)
+	SumIn(const Var& _v, const Set& _s, const Expr& body) :
+		Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(* new Bool)
 	{
 	}
 
-	SumIn(Var _v, Set _s, Expr body, Comp _st) :
-		Sum(body), v(_v), s(_s), st(_st)
+	SumIn(const Var& _v, const Set& _s, const Expr& body, const Bool& _st) :
+		Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -926,11 +1132,16 @@ public:
 		return IdSumIn;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPSumIn(" << v.toString() << " in " << s.toString() << "{" << Sum::body.toString() << "}) ";
 		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return * new SumIn(v, s, body, st);
 	}
 };
 
@@ -938,18 +1149,18 @@ public:
 class SumTo : public Sum
 {
 protected:
-	Var v;
-	Expr begin;
-	Expr end;
-	Comp st; // such that
+	Var& v;
+	Expr& begin;
+	Expr& end;
+	Bool& st; // such that
 public:
-	SumTo(Var _v, Expr _begin, Expr _end, Expr body) :
-		Sum(body), v(_v), begin(_begin), end(_end)
+	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body) :
+		Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(* new Bool)
 	{
 	}
 
-	SumTo(Var _v, Expr _begin, Expr _end, Expr body, Comp _st) :
-		Sum(body), v(_v), begin(_begin), end(_end), st(_st)
+	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Bool& _st) :
+		Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -962,29 +1173,23 @@ public:
 		return IdSumTo;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPSumTo(" << v.toString() << " <- " << begin.toString() << " to " << end.toString() << "{ " << Sum::body.toString() << "}) ";
 		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return *new SumTo(v, begin, end, body, st);
 	}
 };
 
 
 class ForAll
 {
-protected:
-	vector<ForAll> list;
 public:
-	ForAll()
-	{
-	}
-
-	ForAll& add(ForAll fa)
-	{
-		list.push_back(fa);
-		return *this;
-	}
 
 	virtual ~ForAll()
 	{
@@ -995,32 +1200,31 @@ public:
 		return IdForAll;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPForAll(" << list.size() << "){";
-		for(unsigned i=0; i<list.size(); i++)
-			ss << list[i].toString() << " ";
-		ss << "} ";
+		ss << "EMIPForAll() ";
 		return ss.str();
 	}
+
+	virtual ForAll& clone() const = 0;
 };
 
 
 class ForAllIn : public ForAll
 {
 protected:
-	Var v;
-	Set s;
-	Comp st; // such that
+	Var& v;
+	Set& s;
+	Bool& st; // such that
 public:
-	ForAllIn(Var _v, Set _s) :
-		v(_v), s(_s)
+	ForAllIn(const Var& _v, const Set& _s) :
+		v(_v.cloneVar()), s(_s.clone()), st(* new Bool)
 	{
 	}
 
-	ForAllIn(Var _v, Set _s, Comp _st) :
-		v(_v), s(_s), st(_st)
+	ForAllIn(const Var& _v, const Set& _s, const Bool& _st) :
+		v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1033,11 +1237,16 @@ public:
 		return IdForAllIn;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPForAllIn(" << v.toString() << " in " << s.toString() << ") ";
+		ss << "EMIPForAllIn(" << v.toString() << " in " << s.toString() << "| " << st.toString() << ") ";
 		return ss.str();
+	}
+
+	virtual ForAll& clone() const
+	{
+		return * new ForAllIn(v, s, st);
 	}
 };
 
@@ -1045,18 +1254,18 @@ public:
 class ForAllTo : public ForAll
 {
 protected:
-	Var v;
-	Expr begin;
-	Expr end;
-	Comp st; // such that
+	Var& v;
+	Expr& begin;
+	Expr& end;
+	Bool& st; // such that
 public:
-	ForAllTo(Var _v, Expr _begin, Expr _end) :
-		v(_v), begin(_begin), end(_end)
+	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end) :
+		v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(* new Bool)
 	{
 	}
 
-	ForAllTo(Var _v, Expr _begin, Expr _end, Comp _st) :
-		v(_v), begin(_begin), end(_end), st(_st)
+	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end, const Bool& _st) :
+		v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -1069,11 +1278,16 @@ public:
 		return IdForAllTo;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPForAllTo(" << v.toString() << " <- " << begin.toString() << " to " << end.toString() << ") ";
 		return ss.str();
+	}
+
+	virtual ForAll& clone() const
+	{
+		return * new ForAllTo(v, begin, end, st);
 	}
 };
 
@@ -1081,18 +1295,14 @@ public:
 class Cons
 {
 protected:
-	ForAll fa;
-	Expr lhs;
+	ForAll& fa;
+	Expr& lhs;
 	char signal;
-	Expr rhs;
+	Expr& rhs;
 public:
 
-	Cons()
-	{
-	}
-
-	Cons(ForAll _fa, Expr _lhs, char _signal, Expr _rhs) :
-		fa(_fa), lhs(_lhs), signal(_signal), rhs(_rhs)
+	Cons(const ForAll& _fa, const Expr& _lhs, char _signal, const Expr& _rhs) :
+		fa(_fa.clone()), lhs(_lhs.clone()), signal(_signal), rhs(_rhs.clone())
 	{
 	}
 
@@ -1105,25 +1315,30 @@ public:
 		return IdCons;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPCons(" << fa.toString() << ": " << lhs.toString() << " '" << signal << "' " << rhs.toString() << ") ";
 		return ss.str();
 	}
+
+	virtual Cons& clone() const
+	{
+		return * new Cons(fa, lhs, signal, rhs);
+	}
 };
 
 
 
-class IfElse : public Cons
+class IfElse
 {
 protected:
-	Comp condition;
-	vector<Cons> vif;
-	vector<Cons> velse;
+	Bool& condition;
+	vector<Cons*> vif;
+	vector<Cons*> velse;
 public:
-	IfElse(Comp _condition) :
-		condition(_condition)
+	IfElse(const Bool& _condition) :
+		condition(_condition.clone())
 	{
 	}
 
@@ -1131,15 +1346,15 @@ public:
 	{
 	}
 
-	IfElse& addIf(Cons cons)
+	IfElse& addIf(const Cons& cons)
 	{
-		vif.push_back(cons);
+		vif.push_back(&cons.clone());
 		return *this;
 	}
 
-	IfElse& addElse(Cons cons)
+	IfElse& addElse(const Cons& cons)
 	{
-		velse.push_back(cons);
+		velse.push_back(&cons.clone());
 		return *this;
 	}
 
@@ -1148,15 +1363,15 @@ public:
 		return IdIfElse;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPIfElse(if(" << condition.toString() << ") { ";
 		for(unsigned i=0; i<vif.size(); i++)
-			ss << vif[i].toString() << " ";
+			ss << vif[i]->toString() << " ";
 		ss << " } else { " << endl;
 		for(unsigned i=0; i<velse.size(); i++)
-			ss << vif[i].toString() << " ";
+			ss << vif[i]->toString() << " ";
 		ss << " } ";
 
 		return ss.str();
@@ -1169,18 +1384,18 @@ class Model
 {
 protected:
 	ProblemType type;
-	Expr obj;
-	vector<Cons> constraints;
+	Expr* obj;
+	vector<Cons*> constraints;
 
 public:
 
-	Model(ProblemType _type, Expr _obj) :
-		type(_type), obj(_obj)
+	Model(ProblemType _type) :
+			type(_type), obj(NULL)
 	{
 	}
 
-	Model(ProblemType _type) :
-		type(_type)
+	Model(ProblemType _type, const Expr& _obj) :
+		type(_type), obj(&_obj.clone())
 	{
 	}
 
@@ -1188,19 +1403,23 @@ public:
 	{
 	}
 
-	Model& setObj(Expr _obj)
+	Model& setObj(const Expr& _obj)
 	{
-		obj = _obj;
+		if(obj)
+			delete obj;
+
+		obj = &_obj.clone();
+
 		return *this;
 	}
 
-	Model& addCons(Cons cons)
+	Model& addCons(const Cons& cons)
 	{
-		constraints.push_back(cons);
+		constraints.push_back(&cons.clone());
 		return *this;
 	}
 
-	string toString() const
+	virtual string toString() const
 	{
 		stringstream ss;
 		ss << "EMIPModel(";
@@ -1208,9 +1427,9 @@ public:
 			ss << "Minimize";
 		else
 			ss << "Maximize";
-		ss << " { " << obj.toString() << "} subject to: {" << endl;
+		ss << " { " << obj->toString() << "} subject to: {" << endl;
 		for(unsigned i=0; i<constraints.size(); ++i)
-			ss << constraints[i].toString() << endl;
+			ss << constraints[i]->toString() << endl;
 		ss << "})";
 
 		return ss.str();
