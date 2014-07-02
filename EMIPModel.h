@@ -84,11 +84,10 @@ class Var : public Expr
 protected:
 	VarType type;
 	string name;
-	double coef;
 public:
 
-	Var(string _name, VarType _type = Real, double _coef=1.0) :
-		type(_type), name(_name), coef(_coef)
+	Var(string _name, VarType _type = Real) :
+		type(_type), name(_name)
 	{
 	}
 
@@ -104,17 +103,6 @@ public:
 	inline Var& setName(string _name)
 	{
 		name = _name;
-		return *this;
-	}
-
-	inline double getCoef() const
-	{
-		return coef;
-	}
-
-	inline Var& setCoef(double _coef)
-	{
-		coef = _coef;
 		return *this;
 	}
 
@@ -141,7 +129,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar(" << coef << " ";
+		ss << "EMIPVar(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -160,8 +148,8 @@ protected:
 	Expr i1;
 public:
 
-	Var1Index(string _name, Expr _i1, VarType _type = Real, double _coef=1.0) :
-		Var(_name, _type, _coef), i1(_i1)
+	Var1Index(string _name, Expr _i1, VarType _type = Real) :
+		Var(_name, _type), i1(_i1)
 	{
 	}
 
@@ -177,7 +165,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar1Index(" << coef << " ";
+		ss << "EMIPVar1Index(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -198,8 +186,8 @@ protected:
 	Expr i2;
 public:
 
-	Var2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real, double _coef=1.0) :
-		Var(_name, _type, _coef), i1(_i1), i2(_i2)
+	Var2Index(string _name, Expr _i1, Expr _i2, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2)
 	{
 	}
 
@@ -215,7 +203,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar2Index(" << coef << " ";
+		ss << "EMIPVar2Index(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -237,8 +225,8 @@ protected:
 	Expr i3;
 public:
 
-	Var3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real, double _coef=1.0) :
-		Var(_name, _type, _coef), i1(_i1), i2(_i2), i3(_i3)
+	Var3Index(string _name, Expr _i1, Expr _i2, Expr _i3, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3)
 	{
 	}
 
@@ -254,7 +242,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar3Index(" << coef << " ";
+		ss << "EMIPVar3Index(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -279,8 +267,8 @@ protected:
 	Expr i4;
 public:
 
-	Var4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real, double _coef=1.0) :
-		Var(_name, _type, _coef), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
+	Var4Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4)
 	{
 	}
 
@@ -296,7 +284,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar4Index(" << coef << " ";
+		ss << "EMIPVar4Index(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())
@@ -323,8 +311,8 @@ protected:
 	Expr i5;
 public:
 
-	Var5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real, double _coef=1.0) :
-		Var(_name, _type, _coef), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
+	Var5Index(string _name, Expr _i1, Expr _i2, Expr _i3, Expr _i4,  Expr _i5, VarType _type = Real) :
+		Var(_name, _type), i1(_i1), i2(_i2), i3(_i3), i4(_i4), i5(_i5)
 	{
 	}
 
@@ -340,7 +328,7 @@ public:
 	string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPVar5Index(" << coef << " ";
+		ss << "EMIPVar5Index(";
 		if(isInteger())
 			ss << "Integer";
 		else if(isBinary())

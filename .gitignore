@@ -2,3 +2,5 @@
 *.lp
 mipmodel
 emipmodel
+.project
+.cproject

@@ -11,12 +11,17 @@
 #include "EMIPModel.h"
 
 using namespace std;
+using namespace EMIP;
 
-EMIP::Model knapsack()
+Model knapsack()
 {
-	EMIP::Model mk(EMIP::Maximize);
+	Model mk(EMIP::Maximize);
 
-	
+	const Expr& body_obj = Op(Par1Index("p", Var("i")), '*', Var1Index("x", Var("i")));
+	body_obj.print();
+	Expr sum = SumIn(Var("i"), Set("S"), body_obj);
+
+	mk.setObj(sum);
 
 
 	return mk;
