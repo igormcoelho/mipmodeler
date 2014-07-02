@@ -1489,6 +1489,12 @@ public:
 
 // defining const expression
 typedef const Expr& EXPR;
+typedef const Var& VAR;
+typedef const Par& PAR;
+typedef const Bool& BOOL;
+typedef const Set& SET;
+typedef const Cons& CONS;
+typedef const Model& MODEL;
 
 }
 

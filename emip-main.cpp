@@ -18,7 +18,7 @@ Model& knapsack()
 {
 	Model mk(EMIP::Maximize);
 
-	const Var& vi = Var("i");
+	VAR vi = Var("i");
 
 	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));
 
