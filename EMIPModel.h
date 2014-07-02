@@ -53,7 +53,8 @@ public:
 
 	virtual string toString() const = 0;
 
-	virtual string toLatex() const = 0;
+	// add braces before? (only for Expr classes)
+	virtual string toLatex(bool br = true) const = 0;
 
 	virtual void print() const
 	{
@@ -89,7 +90,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << d;
@@ -166,7 +167,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name;
@@ -222,7 +223,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "}";
@@ -274,7 +275,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "}";
@@ -328,7 +329,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "}";
@@ -384,7 +385,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << "}";
@@ -442,7 +443,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << i5.toLatex() << "}";
@@ -519,7 +520,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name;
@@ -570,7 +571,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "}";
@@ -622,7 +623,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "}";
@@ -676,7 +677,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "}";
@@ -732,7 +733,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << "}";
@@ -790,7 +791,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << "," << i5.toLatex() << "}";
@@ -837,10 +838,14 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\left(" << e1.toLatex() << " " << op << " " << e2.toLatex() << "\\right)";
+		if(br)
+			ss << "\\left(";
+		ss << e1.toLatex() << " " << op << " " << e2.toLatex();
+		if(br)
+			ss << "\\right)";
 		return ss.str();
 	}
 
@@ -899,13 +904,16 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\left(" << first.toLatex() << " ";
+		if(br)
+			ss << "\\left(";
+		ss << first.toLatex() << " ";
 		for(unsigned i = 0; i < list.size(); ++i)
 			ss << list[i].first << " " << list[i].second->toLatex() << " ";
-		ss << "\\right)";
+		if(br)
+			ss << "\\right)";
 		return ss.str();
 	}
 
@@ -939,7 +947,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		return "";
 	}
@@ -984,10 +992,14 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\left(" << e1.toLatex() << " " << op << e2.toLatex() << " \\right) ";
+		if(br)
+			ss << "\\left(";
+		ss << e1.toLatex() << " " << op << e2.toLatex();
+		if(br)
+			ss << " \\right) ";
 		return ss.str();
 	}
 
@@ -1030,7 +1042,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << "not(" << e1.toLatex() << ")";
@@ -1072,7 +1084,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << "\\left(" << e1.toLatex() << " " << op << e2.toLatex() << " \\right) ";
@@ -1108,7 +1120,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << name << " ";
@@ -1149,7 +1161,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << "\\{" << elem.toLatex() << " \\} ";
@@ -1190,7 +1202,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
 		ss << "|" << s1.toLatex() << "|";
@@ -1238,10 +1250,14 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\left(" << s1.toLatex() << " ";
+		if(br)
+			ss << "\\left(";
+
+		ss << s1.toLatex() << " ";
+
 		if(op == "U")
 			ss << "\\cup ";
 		else if(op == "-")
@@ -1252,7 +1268,11 @@ public:
 			ss << "\\subset ";
 		else if(op == "C=")
 			ss << "\\subseteq ";
-		ss << s2.toLatex() << " \\right) ";
+
+		ss << s2.toLatex();
+
+		if(br)
+			ss << " \\right) ";
 		return ss.str();
 	}
 
@@ -1284,7 +1304,7 @@ public:
 
 	virtual string toString() const = 0;
 
-	virtual string toLatex() const = 0;
+	virtual string toLatex(bool br = true) const = 0;
 
 	virtual Expr& clone() const = 0;
 };
@@ -1323,10 +1343,10 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\sum_{" << v.toLatex() << " \\in " << s.toLatex() << "}^{}{" << body.toLatex() << "} ";
+		ss << "\\sum_{" << v.toLatex() << " \\in " << s.toLatex(false) << "}{" << body.toLatex(false) << "} ";
 		return ss.str();
 	}
 
@@ -1370,10 +1390,10 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\sum_{" << v.toLatex() << " = " << begin.toLatex() << "}^{" << end.toLatex() << "}{" << body.toLatex() << "} ";
+		ss << "\\sum_{" << v.toLatex() << " = " << begin.toLatex(false) << "}^{" << end.toLatex(false) << "}{" << body.toLatex(false) << "} ";
 		return ss.str();
 	}
 
@@ -1407,7 +1427,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		return "";
 	}
@@ -1451,10 +1471,10 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\forall " << v.toLatex() << " \\in " << s.toLatex();
+		ss << "\\forall " << v.toLatex() << " \\in " << s.toLatex(false);
 		if(st.id() != IdBool)
 			ss << "|" << st.toLatex() << " ";
 		return ss.str();
@@ -1500,10 +1520,10 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\forall " << v.toLatex() << " = " << begin.toLatex() << " to " << end.toLatex() << " ";
+		ss << "\\forall " << v.toLatex() << " = " << begin.toLatex(false) << " to " << end.toLatex(false) << " ";
 		if(st.id() != IdBool)
 			ss << "|" << st.toLatex() << " ";
 		return ss.str();
@@ -1550,10 +1570,10 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << lhs.toLatex() << " ";
+		ss << lhs.toLatex(false) << " ";
 		if(signal == '=')
 			ss << "=";
 		else if(signal == '<')
@@ -1561,7 +1581,7 @@ public:
 		else if(signal == '>')
 			ss << "\\geq";
 
-		ss << " & " << rhs.toLatex() << " & " << fa.toLatex() << " \\\\";
+		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex() << " \\\\";
 
 		return ss.str();
 	}
@@ -1692,7 +1712,7 @@ public:
 		return ss.str();
 	}
 
-	virtual string toLatex() const
+	virtual string toLatex(bool br = true) const
 	{
 		if(!obj)
 			return "";
