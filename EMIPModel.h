@@ -843,7 +843,13 @@ public:
 		stringstream ss;
 		if(br)
 			ss << "\\left(";
-		ss << e1.toLatex() << " " << op << " " << e2.toLatex();
+		ss << e1.toLatex() << " ";
+		if(op == '*')
+			ss << "\\times";
+		else
+			ss << op;
+
+		ss << " " << e2.toLatex();
 		if(br)
 			ss << "\\right)";
 		return ss.str();
@@ -1704,7 +1710,8 @@ public:
 			return ss.str();
 		}
 
-		ss << " { " << obj->toString() << "} subject to: {" << endl;
+		ss << " { " << obj->toString() << "} " << endl;
+		ss << " subject to: {" << endl;
 		for(unsigned i = 0; i < constraints.size(); ++i)
 			ss << constraints[i]->toString() << endl;
 		ss << "})";
@@ -1729,7 +1736,7 @@ public:
 
 		ss << "\\begin{align}\n";
 		for(unsigned i = 0; i < constraints.size(); ++i)
-					ss << constraints[i]->toLatex() << endl;
+			ss << constraints[i]->toLatex() << endl;
 		ss << "\\end{align}\n";
 
 		return ss.str();

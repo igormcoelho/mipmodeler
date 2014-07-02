@@ -26,7 +26,7 @@ Model& knapsack()
 
 	mk.setObj(sumObj);
 
-	cout << sumObj.toLatex() << endl;
+	//cout << sumObj.toLatex() << endl;
 
 	// --------------
 
@@ -44,6 +44,9 @@ int main()
 {
     Model& mk = knapsack();
     mk.print();
+
+    cout << endl;
+    cout << "LaTeX:" << endl;
     cout << mk.toLatex() << endl;
 
     cout << "Finished successfully!" << endl;
