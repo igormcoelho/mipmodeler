@@ -858,9 +858,15 @@ class SumIn : public Sum
 protected:
 	Var v;
 	Set s;
+	Comp st; // such that
 public:
 	SumIn(Var _v, Set _s, Expr body) :
 		Sum(body), v(_v), s(_s)
+	{
+	}
+
+	SumIn(Var _v, Set _s, Expr body, Comp _st) :
+		Sum(body), v(_v), s(_s), st(_st)
 	{
 	}
 
@@ -881,6 +887,41 @@ public:
 	}
 };
 
+
+class SumTo : public Sum
+{
+protected:
+	Var v;
+	Expr begin;
+	Expr end;
+	Comp st; // such that
+public:
+	SumTo(Var _v, Expr _begin, Expr _end, Expr body) :
+		Sum(body), v(_v), begin(_begin), end(_end)
+	{
+	}
+
+	SumTo(Var _v, Expr _begin, Expr _end, Expr body, Comp _st) :
+		Sum(body), v(_v), begin(_begin), end(_end), st(_st)
+	{
+	}
+
+	virtual ~SumTo()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSumTo;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSumTo(" << v.toString() << " <- " << begin.toString() << " to " << end.toString() << " { " << Sum::body.toString() << "} ";
+		return ss.str();
+	}
+};
 
 
 
