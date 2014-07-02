@@ -22,7 +22,8 @@ Model& knapsack()
 
 	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));
 
-	EXPR sumObj = SumIn(vi, Set("I"), body_obj);
+	EXPR sumObj = SumIn(vi, Set("I"), body_obj, "objfunction");
+	cout << "name: " << sumObj.exprName << endl;
 
 	mk.setObj(sumObj);
 

@@ -1332,8 +1332,8 @@ protected:
 	Expr& body;
 
 public:
-	Sum(const Expr& _body) :
-			body(_body.clone())
+	Sum(const Expr& _body, string exprName="") :
+			Expr(exprName), body(_body.clone())
 	{
 	}
 
@@ -1361,13 +1361,13 @@ protected:
 	Bool& st; // such that
 
 public:
-	SumIn(const Var& _v, const Set& _s, const Expr& body) :
-			Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(*new Bool)
+	SumIn(const Var& _v, const Set& _s, const Expr& body, string exprName="") :
+			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(*new Bool)
 	{
 	}
 
-	SumIn(const Var& _v, const Set& _s, const Expr& body, const Bool& _st) :
-			Sum(body.clone()), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
+	SumIn(const Var& _v, const Set& _s, const Expr& body, const Bool& _st, string exprName="") :
+			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1396,7 +1396,7 @@ public:
 
 	virtual Expr& clone() const
 	{
-		return *new SumIn(v, s, body, st);
+		return *new SumIn(v, s, body, st, Expr::exprName);
 	}
 };
 
@@ -1773,8 +1773,9 @@ public:
 		else
 			ss << "max: ";
 		ss << obj->toLatex() << " ";
-		ss << "\\label{eq:objfunc}\n";
-		ss << "\\end{equation}\n\n";
+		if(obj->exprName != "")
+			ss << "\\label{eq:" << obj->exprName << "}";
+		ss << "\n\\end{equation}\n\n";
 
 		ss << "\\begin{align}\n";
 		for(int i = 0; i < ((int) constraints.size()); ++i)
