@@ -29,7 +29,7 @@ enum ProblemType { Minimize, Maximize };
 
 enum VarType { Real, Binary, Integer }; // (?)
 
-enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo };
+enum Id { IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdSet, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse };
 
 class Expr
 {
@@ -1076,6 +1076,93 @@ public:
 		return ss.str();
 	}
 };
+
+
+class Cons
+{
+protected:
+	ForAll fa;
+	Expr lhs;
+	char signal;
+	Expr rhs;
+public:
+
+	Cons()
+	{
+	}
+
+	Cons(ForAll _fa, Expr _lhs, char _signal, Expr _rhs) :
+		fa(_fa), lhs(_lhs), signal(_signal), rhs(_rhs)
+	{
+	}
+
+	virtual ~Cons()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdCons;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPCons(" << fa.toString() << ": " << lhs.toString() << " '" << signal << "' " << rhs.toString() << ") ";
+		return ss.str();
+	}
+};
+
+
+
+class IfElse : public Cons
+{
+protected:
+	Comp condition;
+	vector<Cons> vif;
+	vector<Cons> velse;
+public:
+	IfElse(Comp _condition) :
+		condition(_condition)
+	{
+	}
+
+	virtual ~IfElse()
+	{
+	}
+
+	IfElse& addIf(Cons cons)
+	{
+		vif.push_back(cons);
+		return *this;
+	}
+
+	IfElse& addElse(Cons cons)
+	{
+		velse.push_back(cons);
+		return *this;
+	}
+
+	virtual Id id() const
+	{
+		return IdIfElse;
+	}
+
+	string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPIfElse(if(" << condition.toString() << ") { ";
+		for(unsigned i=0; i<vif.size(); i++)
+			ss << vif[i].toString() << " ";
+		ss << " } else { " << endl;
+		for(unsigned i=0; i<velse.size(); i++)
+			ss << vif[i].toString() << " ";
+		ss << " } ";
+
+		return ss.str();
+	}
+};
+
 
 
 
