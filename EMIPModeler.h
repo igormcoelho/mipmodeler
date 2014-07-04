@@ -141,7 +141,7 @@ public:
 
 class Index: public Expr
 {
-protected:
+public: // TODO: protected
 	Type type;
 	string name;
 public:
@@ -197,6 +197,11 @@ public:
 		GenMIP r;
 		r.now = name;
 		return r;
+	}
+
+	virtual string indexToMIP() const
+	{
+		return name;
 	}
 
 	virtual string toLatex(bool br = true) const
@@ -671,6 +676,11 @@ public:
 
 	virtual Expr& clone() const
 	{
+		return clonePar();
+	}
+
+	virtual Par& clonePar() const
+	{
 		return *new Par(name, type);
 	}
 };
@@ -733,6 +743,12 @@ public:
 	}
 
 	virtual Expr& clone() const
+	{
+		return clonePar();
+	}
+
+
+	virtual Par& clonePar() const
 	{
 		return *new Par1Index(name, i1, type);
 	}
@@ -1273,6 +1289,11 @@ public:
 		return IdSet;
 	}
 
+	string getName() const
+	{
+		return name;
+	}
+
 	virtual string toString() const
 	{
 		stringstream ss;
@@ -1285,6 +1306,13 @@ public:
 		stringstream ss;
 		ss << name << " ";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		r.now = name;
+		return r;
 	}
 
 	virtual Set& clone() const
@@ -1304,7 +1332,7 @@ protected:
 public:
 
 	SetElem(const Expr& _elem) :
-			Set(""), elem(_elem.clone())
+			Set("anonSet"), elem(_elem.clone())
 	{
 	}
 
@@ -1372,6 +1400,15 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		stringstream ss;
+		ss << s1.getName() << ".size() ";
+		r.now = ss.str();
+		return r;
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new SetCard(s1);
@@ -1437,6 +1474,16 @@ public:
 		if(br)
 			ss << " \\right) ";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		stringstream ss;
+		cout << "TODO: IMPLEMENT setOp toMIP()!" << endl;
+		exit(1);
+		r.now = ss.str();
+		return r;
 	}
 
 	virtual Set& clone() const
@@ -1511,6 +1558,47 @@ public:
 		stringstream ss;
 		ss << "\\sum_{" << v.toLatex() << " \\in " << s.toLatex(false) << "}{" << body.toLatex(false) << "} ";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+
+		stringstream ssbefore;
+		stringstream ssnow;
+		stringstream ssafter;
+
+		GenMIP rs = s.toMIP();
+		ssbefore << rs.before;
+		ssafter  << rs.after;
+
+		GenMIP rbody = body.toMIP();
+		ssbefore << rbody.before;
+		ssafter  << rbody.after;
+
+		ssbefore << "int sumin = 0;\n";
+		ssbefore << "for(";
+		if(v.type == Integer)
+			ssbefore << "int";
+		else if(v.type == Binary)
+			ssbefore << "bool";
+		else
+			ssbefore << "double";
+ 		ssbefore << " " << v.indexToMIP() << ": " << rs.now << ")\n";
+		ssbefore << "{\n";
+		ssbefore << "\tsumin += " << rbody.now << ";\n";
+		if(rbody.now == "")
+			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
+
+		ssnow << "sumin";
+
+		ssafter << "}\n";
+
+		r.before = ssbefore.str();
+		r.now = ssnow.str();
+		r.after = ssafter.str();
+
+		return r;
 	}
 
 	virtual Expr& clone() const
@@ -1783,10 +1871,7 @@ public:
 		GenMIP retRhs = rhs.toMIP();
 		ss << retRhs.before;
 		if(retRhs.now == "")
-		{
-			cout << "MIPCons::toMIP:ERROR! empty rhs.now = '" << rhs.toString() << "'" << endl;
-			exit(1);
-		}
+			ss << "MIPCons::toMIP:ERROR! empty rhs.now = '" << rhs.toString() << "'" << endl;
 
 		ss << "MIPCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
 		ss << retRhs.after;
@@ -1794,10 +1879,8 @@ public:
 		GenMIP retLhs = lhs.toMIP();
 		ss << retLhs.before;
 		if(retLhs.now == "")
-		{
-			cout << "MIPCons::toMIP:ERROR! empty lhs.now = '" << lhs.toString() << "'" << endl;
-			exit(1);
-		}
+			ss << "MIPCons::toMIP:ERROR! empty lhs.now = '" << lhs.toString() << "'" << endl;
+
 		ss << name << " = " << retLhs.now << ";\n";
 		ss << retLhs.after;
 
@@ -1903,6 +1986,10 @@ protected:
 	vector<Cons*> constraints;
 	vector<IfElse*> condCons;
 
+	vector<Par*> dependPar;
+	vector<Set*> dependSet;
+	vector<Var*> dependVar;
+
 public:
 
 	Modeler(const Modeler& model) :
@@ -1913,6 +2000,14 @@ public:
 			obj = &model.obj->clone();
 		for(unsigned i = 0; i < model.constraints.size(); ++i)
 			constraints.push_back(&model.constraints[i]->clone());
+		for(unsigned i = 0; i < model.condCons.size(); ++i)
+			condCons.push_back(&model.condCons[i]->clone());
+		for(unsigned i = 0; i < model.dependPar.size(); ++i)
+			dependPar.push_back(&model.dependPar[i]->clonePar());
+		for(unsigned i = 0; i < model.dependVar.size(); ++i)
+			dependVar.push_back(&model.dependVar[i]->cloneVar());
+		for(unsigned i = 0; i < model.dependSet.size(); ++i)
+			dependSet.push_back(&model.dependSet[i]->clone());
 	}
 
 	Modeler(ProblemType _type) :
@@ -1948,6 +2043,24 @@ public:
 	Modeler& addCondCons(const IfElse& cond)
 	{
 		condCons.push_back(&cond.clone());
+		return *this;
+	}
+
+	Modeler& depend(const Par& p)
+	{
+		dependPar.push_back(&p.clonePar());
+		return *this;
+	}
+
+	Modeler& depend(const Var& v)
+	{
+		dependVar.push_back(&v.cloneVar());
+		return *this;
+	}
+
+	Modeler& depend(const Set& s)
+	{
+		dependSet.push_back(&s.clone());
 		return *this;
 	}
 
@@ -2025,6 +2138,14 @@ public:
 		else
 			ss << "MIPMaximize";
 		ss << ");\n\n";
+
+		for(unsigned i=0; i<dependPar.size(); i++)
+			ss << "// depend on parameter '" << dependPar[i]->toString() << "'" << endl;
+		for(unsigned i=0; i<dependVar.size(); i++)
+			ss << "// depend on variable '" << dependVar[i]->toString() << "'" << endl;
+		for(unsigned i=0; i<dependSet.size(); i++)
+			ss << "// depend on set '" << dependSet[i]->toString() << "'" << endl;
+		ss << endl;
 
 		for(unsigned i=0; i<constraints.size(); i++)
 			ss << constraints[i]->toMIP();

@@ -59,6 +59,9 @@ MIPModel mipk()
 Modeler& knapsack()
 {
 	Modeler mk(EMIP::Maximize);
+	mk.depend(Par("p"));
+	mk.depend(Set("I"));
+	cout << "finished depend" << endl;
 
 	INDEX vi = Index("i", Integer);
 
