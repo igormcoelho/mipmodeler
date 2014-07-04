@@ -68,7 +68,7 @@ Modeler& knapsack()
 
 	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));
 
-	EXPR sumObj = SumIn(vi, Set("I"), body_obj, "objfunction");
+	EXPR sumObj = SumTo(SumIn(vi, Set("I"), body_obj, "objfunction1"));
 	cout << "name: " << sumObj.exprName << endl;
 
 	mk.setObj(sumObj);
@@ -77,7 +77,7 @@ Modeler& knapsack()
 
 	// --------------
 
-	EXPR sumC1 = SumIn(vi, Set("I"), Op(Par1Index("w", vi), '*', Var1Index("x", vi)));
+	EXPR sumC1 = SumTo(SumIn(vi, Set("I"), Op(Par1Index("w", vi), '*', Var1Index("x", vi))));
 
 	CONS c1 = Cons("c1", sumC1, '<', Par("C"));
 

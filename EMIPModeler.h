@@ -133,6 +133,15 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		stringstream ss;
+		ss << d;
+		r.now = ss.str();
+		return r;
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Num(d);
@@ -1521,7 +1530,7 @@ public:
 
 class Sum: public Expr
 {
-protected:
+public: // TODO: protect
 	Expr& body;
 
 public:
@@ -1548,19 +1557,19 @@ public:
 
 class SumIn: public Sum
 {
-protected:
+public: // protect
 	Index& v;
 	Set& s;
 	Boolean& st; // such that
 
 public:
 	SumIn(const Index& _v, const Set& _s, const Expr& body, string exprName="") :
-			Sum(body.clone(), exprName), v(_v.cloneIndex()), s(_s.clone()), st(*new Boolean)
+			Sum(body, exprName), v(_v.cloneIndex()), s(_s.clone()), st(*new Boolean)
 	{
 	}
 
 	SumIn(const Index& _v, const Set& _s, const Expr& body, const Boolean& _st, string exprName="") :
-			Sum(body.clone(), exprName), v(_v.cloneIndex()), s(_s.clone()), st(_st.clone())
+			Sum(body, exprName), v(_v.cloneIndex()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1635,14 +1644,20 @@ public:
 
 class SumTo: public Sum
 {
-protected:
+public: // TODO: protect
 	Index& v;
 	Expr& begin;
 	Expr& end;
 	Boolean& st; // such that
 public:
-	SumTo(const Index& _v, const Expr& _begin, const Expr& _end, const Expr& body) :
-			Sum(body.clone()), v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
+
+	SumTo(const SumIn& sin, int start = 0) :
+		Sum(sin.body, sin.exprName), v(sin.v.cloneIndex()), begin(* new Num(start)), end(start==0?(Expr&)* new Op(SetCard(sin.s), '-', Num(1)):(Expr&)* new SetCard(sin.s)), st(sin.st.clone())
+	{
+	}
+
+	SumTo(const Index& _v, const Expr& _begin, const Expr& _end, const Expr& body, string exprName="") :
+			Sum(body, exprName), v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
 	{
 	}
 
@@ -1672,6 +1687,50 @@ public:
 		stringstream ss;
 		ss << "\\sum_{" << v.toLatex() << " = " << begin.toLatex(false) << "}^{" << end.toLatex(false) << "}{" << body.toLatex(false) << "} ";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+
+		stringstream ssbefore;
+		stringstream ssnow;
+		stringstream ssafter;
+
+		GenMIP rb = begin.toMIP();
+		ssbefore << rb.before;
+		ssafter  << rb.after;
+
+		GenMIP re = end.toMIP();
+		ssbefore << re.before;
+		ssafter  << re.after;
+
+		GenMIP rbody = body.toMIP();
+		ssbefore << rbody.before;
+		ssafter  << rbody.after;
+
+		ssbefore << "int sumin = 0;\n";
+		ssbefore << "for(";
+		if(v.type == Integer)
+			ssbefore << "int";
+		else if(v.type == Binary)
+			ssbefore << "bool";
+		else
+			ssbefore << "double";
+ 		ssbefore << " " << v.indexToMIP() << " = " << rb.now << "; " << v.indexToMIP() << " <= " << re.now << "; ++" << v.indexToMIP() << ")\n";
+		ssbefore << "{\n";
+		ssbefore << "\tsumin += " << rbody.now << ";\n";
+		if(rbody.now == "")
+			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
+		ssbefore << "}\n";
+
+		ssnow << "sumin";
+
+		r.before = ssbefore.str();
+		r.now = ssnow.str();
+		r.after = ssafter.str();
+
+		return r;
 	}
 
 	virtual Expr& clone() const
