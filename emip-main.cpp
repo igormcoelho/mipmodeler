@@ -18,15 +18,28 @@ using namespace EMIP;
 
 MIPModel mipk()
 {
-	MIPModel model(MIPMaximize);
+	// ==================
+	// user configuration
+	// ==================
 
-	unsigned N = 10;
+	int N = 10;
+	vector<int> I; // auxiliar set 'I'
+	for(int i=0; i<N; i++)
+		I.push_back(i);
+
 	vector<double> p(N, 1.0);
 	vector<double> w(N, 2.0);
 	int C = 8;
 
+
+	// ====================
+	// automatic generation
+	// ====================
+
+	MIPModel model(MIPMaximize);
+
 	MIPVarArray x(N, "x");
-	for(unsigned i=0; i<N; ++i)
+	for(int i: I)
 		x[i] = MIPVar(MIPBinary, 0, 1);
 	x.renameVars();
 

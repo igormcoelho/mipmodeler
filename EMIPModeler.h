@@ -1177,6 +1177,9 @@ public:
 	}
 };
 
+
+// TODO: create MIPRange{n1..n2} : Set
+
 class SetElem: public Set
 {
 protected:
