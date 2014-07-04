@@ -1920,7 +1920,7 @@ public:
 	virtual string toString() const
 	{
 		stringstream ss;
-		ss << "EMIPCons('" << name << "'" << fa.toString() << ": " << lhs.toString() << " '" << signal << "' " << rhs.toString() << ") ";
+		ss << "EMIPCons('" << name << "', " << fa.toString() << ": " << lhs.toString() << " '" << signal << "' " << rhs.toString() << ") ";
 		return ss.str();
 	}
 
@@ -1960,7 +1960,7 @@ public:
 		if(retRhs.now == "")
 			ss << "MIPCons::toMIP:ERROR! empty rhs.now = '" << rhs.toString() << "'" << endl;
 
-		ss << "MIPCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
+		ss << "IloCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
 		ss << retRhs.after;
 
 		GenMIP retLhs = lhs.toMIP();
@@ -2241,6 +2241,16 @@ public:
 		ss << "\n\n";
 		ss << "IloExpr " << obj->exprName << "(env);\n";
 
+		ss << "{\n";
+		GenMIP exprobj = obj->toMIP();
+		ss << exprobj.before;
+		ss << obj->exprName << " += " << exprobj.now << ";\n";
+		if(exprobj.after != "")
+		{
+			cout << "ERROR: UNEXPECTED EXTRA STUFF AFTER OBJ: '" << exprobj.after << "'" << endl;
+			exit(1);
+		}
+		ss << "}\n\n";
 		
 
 		ss << "model.add(";
@@ -2249,11 +2259,14 @@ public:
 		else
 			ss << "IloMaximize";
 
-		ss << "(env, " << obj->exprName << "));\n";
+		ss << "(env, " << obj->exprName << "));\n\n";
 
 
 		for(unsigned i=0; i<constraints.size(); i++)
-			ss << constraints[i]->toMIP();
+		{
+			ss << "// constraints: " << constraints[i]->toString() << endl; 
+			ss << constraints[i]->toMIP() << endl;
+		}
 
 		return ss.str();
 	}
