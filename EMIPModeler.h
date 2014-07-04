@@ -1732,20 +1732,20 @@ public:
 		stringstream ss;
 
 		GenMIP retFA = fa.toMIP();
-		ss << retFA.before << endl;
-		ss << retFA.now << endl;
+		ss << retFA.before;
+		// unused retFA.now
 
 		GenMIP retRhs = rhs.toMIP();
-		ss << retRhs.before << endl;
+		ss << retRhs.before;
 		ss << "MIPCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
-		ss << retRhs.after << endl;
+		ss << retRhs.after;
 
 		GenMIP retLhs = lhs.toMIP();
-		ss << retLhs.before << endl;
+		ss << retLhs.before;
 		ss << name << " = " << retLhs.now << ";\n";
-		ss << retLhs.after << endl;
+		ss << retLhs.after;
 
-		ss << retFA.after << endl;
+		ss << retFA.after;
 
 		return ss.str();
 	}
