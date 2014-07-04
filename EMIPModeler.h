@@ -92,21 +92,6 @@ public:
 		return *new Expr(exprName);
 	}
 
-	static string merge(const Expr& e1, const Expr& e2)
-	{
-		if((e1.exprName != "") && (e2.exprName != ""))
-		{
-			cout << "Expr::merge: ERROR! double names '" << e1.exprName << "' '" << e2.exprName << "'" << endl;
-			exit(1);
-			return "";
-		}
-		else if(e1.exprName != "")
-			return e1.exprName;
-		else if(e2.exprName != "")
-			return e2.exprName;
-		else
-			return "";
-	}
 };
 
 class Num: public Expr
