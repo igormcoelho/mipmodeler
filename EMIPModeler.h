@@ -192,6 +192,13 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		r.now = name;
+		return r;
+	}
+
 	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
