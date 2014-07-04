@@ -48,6 +48,7 @@ struct GenMIP
 	string after;
 };
 
+
 class Expr
 {
 public:
@@ -97,8 +98,9 @@ public:
 	{
 		return *new Expr(exprName);
 	}
-
 };
+
+
 
 class Num: public Expr
 {
@@ -1661,8 +1663,8 @@ public:
 	{
 	}
 
-	SumTo(const Index& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Boolean& _st) :
-			Sum(body.clone()), v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
+	SumTo(const Index& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Boolean& _st, string exprName="") :
+			Sum(body, exprName), v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -1709,7 +1711,7 @@ public:
 		ssbefore << rbody.before;
 		ssafter  << rbody.after;
 
-		ssbefore << "int sumin = 0;\n";
+		ssbefore << "IloExpr sumin;\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -1735,7 +1737,7 @@ public:
 
 	virtual Expr& clone() const
 	{
-		return *new SumTo(v, begin, end, body, st);
+		return *new SumTo(v, begin, end, body, st, Sum::exprName);
 	}
 };
 
@@ -2201,21 +2203,9 @@ public:
 		return ss.str();
 	}
 
-	virtual string toConcert() const
+	virtual string toConcertOld() const
 	{
-		stringstream ss;
-		ss << "IloEnv env;\n";
-		ss << "IloModel model(env)\n";
-		ss << "\n\n";
-		ss << "IloExpr objective(env);\n";
 
-		ss << "model.add(IloMaximize(env, objective));\n";
-
-		return ss.str();
-	}
-
-	virtual string toMIP() const
-	{
 		stringstream ss;
 		ss << "MIPModel model(";
 		if(type == Minimize)
@@ -2231,6 +2221,36 @@ public:
 		for(unsigned i=0; i<dependSet.size(); i++)
 			ss << "// depend on set '" << dependSet[i]->toString() << "'" << endl;
 		ss << endl;
+
+
+		return ss.str();
+	}
+
+	virtual string toMIP() const
+	{
+		if(obj->exprName == "")
+		{
+			cout << "ERROR! EMPTY NAME FOR OBJ" << endl;
+			exit(1);
+			return "";
+		}
+
+		stringstream ss;
+		ss << "IloEnv env;\n";
+		ss << "IloModel model(env)\n";
+		ss << "\n\n";
+		ss << "IloExpr " << obj->exprName << "(env);\n";
+
+		
+
+		ss << "model.add(";
+		if(type == Minimize)
+			ss << "IloMinimize";
+		else
+			ss << "IloMaximize";
+
+		ss << "(env, " << obj->exprName << "));\n";
+
 
 		for(unsigned i=0; i<constraints.size(); i++)
 			ss << constraints[i]->toMIP();

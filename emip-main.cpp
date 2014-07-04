@@ -39,7 +39,8 @@ MIPModel mipk()
 	MIPModel model(MIPMaximize);
 
 	MIPVarArray x(N, "x");
-	for(int i: I)
+	//for(int i: I) // TODO: USE C++11
+	for(int i=0; i<N; i++)
 		x[i] = MIPVar(MIPBinary, 0, 1);
 	x.renameVars();
 
@@ -59,11 +60,10 @@ MIPModel mipk()
 Modeler& knapsack()
 {
 	Modeler mk(EMIP::Maximize);
-	mk.depend(Par("p"));
-	mk.depend(Par("w"));
-	mk.depend(Set("I"));
-	cout << "finished depend" << endl;
-
+	//mk.depend(Par("p"));
+	//mk.depend(Par("w"));
+	//mk.depend(Set("I"));
+	
 	INDEX vi = Index("i", Integer);
 
 	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));

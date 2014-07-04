@@ -25,31 +25,38 @@ using namespace std;
 
 enum MIPType { MIPMinimize, MIPMaximize };
 
-enum MIPVarType { MIPReal, MIPBinary, MIPInteger };
+enum MIPVarType { MIPReal, MIPBinary, MIPInteger, MIPUnknown };
 
 class MIPVar
 {
 protected:
 	MIPVarType type;
 	string name;
+	double coef; // INTERNAL USE
 
 	double lb;
 	double ub;
 
 public:
 
+	// USE AS NUMBER
+	MIPVar(double d) :
+		coef(d), type(MIPUnknown), name(""), lb(d), ub(d)
+	{
+	} 
+
 	MIPVar(MIPVarType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
-		type(_type), name(""), lb(_lb), ub(_ub)
+		coef(1.0), type(_type), name(""), lb(_lb), ub(_ub)
 	{
 	}
 
 	MIPVar(string _name, MIPVarType _type = MIPReal, double _lb = 0, double _ub = MIPInf) :
-		type(_type), name(_name), lb(_lb), ub(_ub)
+		coef(1.0), type(_type), name(_name), lb(_lb), ub(_ub)
 	{
 	}
 
 	MIPVar(const MIPVar& var) :
-		name(var.name), type(var.type), lb(var.lb), ub(var.ub)
+		coef(var.coef), name(var.name), type(var.type), lb(var.lb), ub(var.ub)
 	{
 	}
 
@@ -135,11 +142,22 @@ public:
 		name = var.name;
 		lb   = var.lb;
 		ub   = var.ub;
+		coef = var.coef;
 
 		return *this;
 	}
+
+	MIPVar& operator*=(const MIPVar& cvar)
+	{                        
+	    coef *= cvar.coef;
+	    return *this;
+	}
 };
 
+inline MIPVar operator*(MIPVar lhs, const MIPVar& rhs)
+{
+	return lhs *= rhs;
+}
 
 class MIPCons
 {
