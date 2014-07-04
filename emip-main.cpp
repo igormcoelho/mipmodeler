@@ -60,7 +60,7 @@ Modeler& knapsack()
 {
 	Modeler mk(EMIP::Maximize);
 
-	VAR vi = Var("i");
+	INDEX vi = Index("i", Integer);
 
 	EXPR body_obj = Op(Par1Index("p", vi), '*', Var1Index("x", vi));
 

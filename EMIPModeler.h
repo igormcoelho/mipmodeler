@@ -1430,18 +1430,18 @@ public:
 class SumIn: public Sum
 {
 protected:
-	Var& v;
+	Index& v;
 	Set& s;
 	Boolean& st; // such that
 
 public:
-	SumIn(const Var& _v, const Set& _s, const Expr& body, string exprName="") :
-			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(*new Boolean)
+	SumIn(const Index& _v, const Set& _s, const Expr& body, string exprName="") :
+			Sum(body.clone(), exprName), v(_v.cloneIndex()), s(_s.clone()), st(*new Boolean)
 	{
 	}
 
-	SumIn(const Var& _v, const Set& _s, const Expr& body, const Boolean& _st, string exprName="") :
-			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
+	SumIn(const Index& _v, const Set& _s, const Expr& body, const Boolean& _st, string exprName="") :
+			Sum(body.clone(), exprName), v(_v.cloneIndex()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1477,18 +1477,18 @@ public:
 class SumTo: public Sum
 {
 protected:
-	Var& v;
+	Index& v;
 	Expr& begin;
 	Expr& end;
 	Boolean& st; // such that
 public:
-	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body) :
-			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
+	SumTo(const Index& _v, const Expr& _begin, const Expr& _end, const Expr& body) :
+			Sum(body.clone()), v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
 	{
 	}
 
-	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Boolean& _st) :
-			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
+	SumTo(const Index& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Boolean& _st) :
+			Sum(body.clone()), v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -1565,17 +1565,17 @@ public:
 class ForAllIn: public ForAll
 {
 protected:
-	Var& v;
+	Index& v;
 	Set& s;
 	Boolean& st; // such that
 public:
-	ForAllIn(const Var& _v, const Set& _s) :
-			v(_v.cloneVar()), s(_s.clone()), st(*new Boolean)
+	ForAllIn(const Index& _v, const Set& _s) :
+			v(_v.cloneIndex()), s(_s.clone()), st(*new Boolean)
 	{
 	}
 
-	ForAllIn(const Var& _v, const Set& _s, const Boolean& _st) :
-			v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
+	ForAllIn(const Index& _v, const Set& _s, const Boolean& _st) :
+			v(_v.cloneIndex()), s(_s.clone()), st(_st.clone())
 	{
 	}
 
@@ -1613,18 +1613,18 @@ public:
 class ForAllTo: public ForAll
 {
 protected:
-	Var& v;
+	Index& v;
 	Expr& begin;
 	Expr& end;
 	Boolean& st; // such that
 public:
-	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end) :
-			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
+	ForAllTo(const Index& _v, const Expr& _begin, const Expr& _end) :
+			v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
 	{
 	}
 
-	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end, const Boolean& _st) :
-			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
+	ForAllTo(const Index& _v, const Expr& _begin, const Expr& _end, const Boolean& _st) :
+			v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
 
@@ -1989,6 +1989,7 @@ public:
 
 // defining const expression
 typedef const Expr& EXPR;
+typedef const Index& INDEX;
 typedef const Var& VAR;
 typedef const Par& PAR;
 typedef const Boolean& BOOLEAN;
