@@ -60,6 +60,7 @@ Modeler& knapsack()
 {
 	Modeler mk(EMIP::Maximize);
 	mk.depend(Par("p"));
+	mk.depend(Par("w"));
 	mk.depend(Set("I"));
 	cout << "finished depend" << endl;
 

@@ -1025,6 +1025,33 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		stringstream ss;
+		stringstream ssbef;
+		stringstream ssaft;
+
+		GenMIP r1 = e1.toMIP();
+		ssbef << r1.before;
+		ssaft << r1.after;
+		GenMIP r2 = e2.toMIP();
+		ssbef << r2.before;
+		ssaft << r2.after;
+
+		ss << "(" << r1.now << " " << op << " " << r2.now << ") ";
+		if(r1.now == "")
+			ss << "ERROR(EMPTY '" << e1.toString() << "')";
+		if(r2.now == "")
+			ss << "ERROR(EMPTY '" << e2.toString() << "')";
+
+		r.before = ssbef.str();
+		r.after  = ssaft.str();
+		r.now    = ss.str();
+
+		return r;
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Op(e1, op, e2);
@@ -1589,10 +1616,9 @@ public:
 		ssbefore << "\tsumin += " << rbody.now << ";\n";
 		if(rbody.now == "")
 			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
+		ssbefore << "}\n";
 
 		ssnow << "sumin";
-
-		ssafter << "}\n";
 
 		r.before = ssbefore.str();
 		r.now = ssnow.str();
