@@ -1651,6 +1651,15 @@ public:
 	{
 	}
 
+	IfElse(const IfElse& ifelse) :
+		condition(ifelse.condition.clone())
+	{
+		for(unsigned i=0; i < ifelse.vif.size(); ++i)
+			vif.push_back(&ifelse.vif[i]->clone());
+		for(unsigned i=0; i < ifelse.velse.size(); ++i)
+			velse.push_back(&ifelse.velse[i]->clone());
+	}
+
 	virtual ~IfElse()
 	{
 	}
@@ -1685,6 +1694,11 @@ public:
 
 		return ss.str();
 	}
+
+	virtual IfElse& clone() const
+	{
+		return * new IfElse(*this);
+	}
 };
 
 class Modeler
@@ -1693,6 +1707,7 @@ protected:
 	ProblemType type;
 	Expr* obj;
 	vector<Cons*> constraints;
+	vector<IfElse*> condCons;
 
 public:
 
@@ -1733,6 +1748,12 @@ public:
 	Modeler& addCons(const Cons& cons)
 	{
 		constraints.push_back(&cons.clone());
+		return *this;
+	}
+
+	Modeler& addCondCons(const IfElse& cond)
+	{
+		condCons.push_back(&cond.clone());
 		return *this;
 	}
 
@@ -1789,6 +1810,24 @@ public:
 	{
 		stringstream ss;
 		ss << "IloEnv env;\n";
+		ss << "IloModel model(env)\n";
+		ss << "\n\n";
+		ss << "IloExpr objective(env);\n";
+
+		ss << "model.add(IloMaximize(env, objective));\n";
+
+		return ss.str();
+	}
+
+	virtual string toMIP() const
+	{
+		stringstream ss;
+		ss << "MIPModel model(";
+		if(type == Minimize)
+			ss << "MIPMinimize";
+		else
+			ss << "MIPMaximize";
+		ss << ");\n";
 		ss << "IloModel model(env)\n";
 		ss << "\n\n";
 		ss << "IloExpr objective(env);\n";

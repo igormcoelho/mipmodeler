@@ -45,11 +45,18 @@ Modeler& knapsack()
 int main()
 {
     Modeler& mk = knapsack();
+    cout << "EMIP tree structure:" << endl;
     mk.print();
 
-    cout << endl;
+    cout << endl << endl;
+
     cout << "LaTeX:" << endl;
     cout << mk.toLatex() << endl;
+
+    cout << endl << endl;
+
+    cout << "MIP:" << endl;
+    cout << mk.toMIP() << endl;
 
     cout << "Finished successfully!" << endl;
 
