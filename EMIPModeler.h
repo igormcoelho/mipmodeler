@@ -967,15 +967,15 @@ public:
 	}
 };
 
-class Bool
+class Boolean
 {
 public:
 
-	Bool()
+	Boolean()
 	{
 	}
 
-	virtual ~Bool()
+	virtual ~Boolean()
 	{
 	}
 
@@ -996,13 +996,13 @@ public:
 		return "";
 	}
 
-	virtual Bool& clone() const
+	virtual Boolean& clone() const
 	{
-		return *new Bool;
+		return *new Boolean;
 	}
 };
 
-class Comp: public Bool
+class Comp: public Boolean
 {
 protected:
 	string op;
@@ -1047,7 +1047,7 @@ public:
 		return ss.str();
 	}
 
-	virtual Bool& clone() const
+	virtual Boolean& clone() const
 	{
 		return cloneComp();
 	}
@@ -1058,14 +1058,14 @@ public:
 	}
 };
 
-class Not: public Bool
+class Not: public Boolean
 {
 protected:
-	Bool& e1;
+	Boolean& e1;
 	string op;
 public:
 
-	Not(const Bool& _e1) :
+	Not(const Boolean& _e1) :
 			e1(_e1.clone())
 	{
 	}
@@ -1094,7 +1094,7 @@ public:
 	}
 };
 
-class BoolOp: public Bool
+class BoolOp: public Boolean
 {
 protected:
 	Comp& e1;
@@ -1358,15 +1358,15 @@ class SumIn: public Sum
 protected:
 	Var& v;
 	Set& s;
-	Bool& st; // such that
+	Boolean& st; // such that
 
 public:
 	SumIn(const Var& _v, const Set& _s, const Expr& body, string exprName="") :
-			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(*new Bool)
+			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(*new Boolean)
 	{
 	}
 
-	SumIn(const Var& _v, const Set& _s, const Expr& body, const Bool& _st, string exprName="") :
+	SumIn(const Var& _v, const Set& _s, const Expr& body, const Boolean& _st, string exprName="") :
 			Sum(body.clone(), exprName), v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
@@ -1406,14 +1406,14 @@ protected:
 	Var& v;
 	Expr& begin;
 	Expr& end;
-	Bool& st; // such that
+	Boolean& st; // such that
 public:
 	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body) :
-			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Bool)
+			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
 	{
 	}
 
-	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Bool& _st) :
+	SumTo(const Var& _v, const Expr& _begin, const Expr& _end, const Expr& body, const Boolean& _st) :
 			Sum(body.clone()), v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
@@ -1487,14 +1487,14 @@ class ForAllIn: public ForAll
 protected:
 	Var& v;
 	Set& s;
-	Bool& st; // such that
+	Boolean& st; // such that
 public:
 	ForAllIn(const Var& _v, const Set& _s) :
-			v(_v.cloneVar()), s(_s.clone()), st(*new Bool)
+			v(_v.cloneVar()), s(_s.clone()), st(*new Boolean)
 	{
 	}
 
-	ForAllIn(const Var& _v, const Set& _s, const Bool& _st) :
+	ForAllIn(const Var& _v, const Set& _s, const Boolean& _st) :
 			v(_v.cloneVar()), s(_s.clone()), st(_st.clone())
 	{
 	}
@@ -1536,14 +1536,14 @@ protected:
 	Var& v;
 	Expr& begin;
 	Expr& end;
-	Bool& st; // such that
+	Boolean& st; // such that
 public:
 	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end) :
-			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Bool)
+			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
 	{
 	}
 
-	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end, const Bool& _st) :
+	ForAllTo(const Var& _v, const Expr& _begin, const Expr& _end, const Boolean& _st) :
 			v(_v.cloneVar()), begin(_begin.clone()), end(_end.clone()), st(_st.clone())
 	{
 	}
@@ -1642,11 +1642,11 @@ public:
 class IfElse
 {
 protected:
-	Bool& condition;
+	Boolean& condition;
 	vector<Cons*> vif;
 	vector<Cons*> velse;
 public:
-	IfElse(const Bool& _condition) :
+	IfElse(const Boolean& _condition) :
 			condition(_condition.clone())
 	{
 	}
@@ -1876,9 +1876,10 @@ public:
 typedef const Expr& EXPR;
 typedef const Var& VAR;
 typedef const Par& PAR;
-typedef const Bool& BOOL;
+typedef const Boolean& BOOLEAN;
 typedef const Set& SET;
 typedef const Cons& CONS;
+typedef const IfElse& IFELSE;
 typedef const Modeler& MODELER;
 
 }
