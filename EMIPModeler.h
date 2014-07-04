@@ -41,6 +41,13 @@ enum Id
 	IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse
 };
 
+struct GenMIP
+{
+	string now;
+	string before;
+	string after;
+};
+
 class Expr
 {
 public:
@@ -1576,6 +1583,15 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP ret;
+
+
+
+		return ret;
+	}
+
 	virtual ForAll& clone() const
 	{
 		return *new ForAllTo(v, begin, end, st);
@@ -1629,9 +1645,35 @@ public:
 		else if(signal == '>')
 			ss << "\\geq";
 
-		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex() << " \\label{eq:" << name << "} ";
+		ss << " & " << rhs.toLatex(false) << " & " << fa.toLatex();
+		if(name != "")
+			ss << " \\label{eq:" << name << "} ";
 		if(linebreak)
 			ss << " \\\\";
+
+		return ss.str();
+	}
+
+	virtual string toMIP(bool linebreak) const
+	{
+		if(name == "")
+			return "";
+
+		GenMIP retFA = fa.toMIP();
+		ss << retFA.before << endl;
+		ss << retFA.now << endl;
+
+		GenMIP retRhs = rhs.toMIP();
+		ss << retRhs.before << endl;
+		ss << "MIPCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
+		ss << retRhs.after << endl;
+
+		GenMIP retLhs = lhs.toMIP();
+		ss << retLhs.before << endl;
+		ss << name << " = " << retLhs.now << ";\n";
+		ss << retLhs.after << endl;
+
+		ss << retFA.after << endl;
 
 		return ss.str();
 	}
