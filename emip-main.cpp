@@ -44,11 +44,11 @@ MIPModel mipk()
 		x[i] = MIPVar(MIPBinary, 0, 1);
 	x.renameVars();
 
-	for(unsigned i=0; i<N; ++i)
+	for(int i=0; i<N; ++i)
 		model.add(p[i], x[i]);
 
 	MIPCons cap('<', C); // could use name also: cap("capacity", '<', C)
-	for(unsigned i=0; i<N; ++i)
+	for(int i=0; i<N; ++i)
 		cap.add(w[i], x[i]);
 
 	model.add(cap);

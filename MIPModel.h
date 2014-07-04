@@ -30,9 +30,9 @@ enum MIPVarType { MIPReal, MIPBinary, MIPInteger, MIPUnknown };
 class MIPVar
 {
 protected:
+	double coef; // INTERNAL USE
 	MIPVarType type;
 	string name;
-	double coef; // INTERNAL USE
 
 	double lb;
 	double ub;
@@ -56,7 +56,7 @@ public:
 	}
 
 	MIPVar(const MIPVar& var) :
-		coef(var.coef), name(var.name), type(var.type), lb(var.lb), ub(var.ub)
+		coef(var.coef), type(var.type), name(var.name), lb(var.lb), ub(var.ub)
 	{
 	}
 
@@ -407,7 +407,7 @@ public:
 			string cname = constraints[c]->getName();
 			fprintf(f, " %s:", cname.c_str());
 
-			for(int i=0; i<LINE_BASE_CONS-2-cname.length(); i++)
+			for(int i=0; i<LINE_BASE_CONS-2-((int)cname.length()); i++)
 				fprintf(f, " ");
 
 			addUniqueByType(&constraints[c]->getVar(0), vbin, vint, vreal);

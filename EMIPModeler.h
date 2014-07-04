@@ -83,9 +83,15 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
+		if(var != "")
+		{
+			cout << "Expr::toMIP():ERROR! NOT A VALUE TO PUT IN '" << var << "'" << endl;
+			exit(1);
+		}
+
 		return r;
 	}
 
@@ -135,12 +141,16 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
 		stringstream ss;
-		ss << d;
+		if(var != "")
+			ss << var << " += " << d << ";\n";
+		else
+			ss << d;
 		r.now = ss.str();
+		cout << "NUM('" << var << "')='" << r.now << "'" << endl;
 		return r;
 	}
 
@@ -203,10 +213,16 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
-		r.now = name;
+		if(var == "")
+			r.now = name;
+		else
+		{
+			stringstream ss;
+			ss << var << " += " << name << ";\n";
+		}
 		return r;
 	}
 
@@ -306,10 +322,16 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
-		r.now = name;
+		if(var == "")
+			r.now = name;
+		else
+		{
+			stringstream ss;
+			ss << var << " += " << name << ";\n";
+		}
 		return r;
 	}
 
@@ -369,15 +391,21 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
-		GenMIP ri1 = i1.toMIP();
+		GenMIP ri1 = i1.toMIP("");
 		stringstream ss;
 		r.before = ri1.before;
+		if(var != "")
+			ss << var << " += ";
 		ss << name << "[" << ri1.now << "]";
 		r.now = ss.str();
-		r.after = ri1.after;
+		stringstream ssaft;
+		if(var != "")
+			ssaft << ";\n";
+		ssaft << ri1.after;
+		r.after = ssaft.str();
 		return r;
 	}
 
@@ -433,23 +461,28 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
 		stringstream ss;
 		stringstream ssbef;
 		stringstream ssaft;
 
-		GenMIP ri1 = i1.toMIP();
-		GenMIP ri2 = i2.toMIP();
+		GenMIP ri1 = i1.toMIP("");
+		GenMIP ri2 = i2.toMIP("");
 
 		ssbef << ri1.before;
 		ssbef << ri2.before;
 		r.before = ssbef.str();
 
+		if(var != "")
+			ss << var << " += ";
 		ss << name << "[" << ri1.now << "][" << ri2.now << "]";
 		r.now = ss.str();
 
+
+		if(var != "")
+			ssaft << ";\n";
 		ssaft << ri1.after;
 		ssaft << ri2.after;
 
@@ -702,10 +735,16 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
-		r.now = name;
+		if(var == "")
+			r.now = name;
+		else
+		{
+			stringstream ss;
+			ss << var << " += " << name << ";\n";
+		}
 		return r;
 	}
 
@@ -765,15 +804,21 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
-		GenMIP ri1 = i1.toMIP();
+		GenMIP ri1 = i1.toMIP("");
 		stringstream ss;
 		r.before = ri1.before;
+		if(var != "")
+			ss << var << " += ";
 		ss << name << "[" << ri1.now << "]";
 		r.now = ss.str();
-		r.after = ri1.after;
+		stringstream ssaft;
+		if(var != "")
+			ssaft << ";\n";
+		ssaft << ri1.after;
+		r.after = ssaft.str();
 		return r;
 	}
 
@@ -835,23 +880,28 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
 		stringstream ss;
 		stringstream ssbef;
 		stringstream ssaft;
 
-		GenMIP ri1 = i1.toMIP();
-		GenMIP ri2 = i2.toMIP();
+		GenMIP ri1 = i1.toMIP("");
+		GenMIP ri2 = i2.toMIP("");
 
 		ssbef << ri1.before;
 		ssbef << ri2.before;
 		r.before = ssbef.str();
 
+		if(var != "")
+			ss << var << " += ";
 		ss << name << "[" << ri1.now << "][" << ri2.now << "]";
 		r.now = ss.str();
 
+
+		if(var != "")
+			ssaft << ";\n";
 		ssaft << ri1.after;
 		ssaft << ri2.after;
 
@@ -1036,8 +1086,8 @@ public:
 class Op: public Expr
 {
 protected:
-	char op;
 	Expr& e1;
+	char op;
 	Expr& e2;
 
 public:
@@ -1084,19 +1134,27 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
+		cout <<"CALL OP(var='" << var << "'): " << toString() << endl;
 		GenMIP r;
 		stringstream ss;
 		stringstream ssbef;
 		stringstream ssaft;
 
-		GenMIP r1 = e1.toMIP();
+		GenMIP r1 = e1.toMIP("");
 		ssbef << r1.before;
-		ssaft << r1.after;
-		GenMIP r2 = e2.toMIP();
+
+		GenMIP r2 = e2.toMIP("");
 		ssbef << r2.before;
-		ssaft << r2.after;
+
+		unsigned size = var.size();
+		if(size != 0);
+		{
+			cout << "VAR LENGTH != 0 => " << size << endl;
+			cout << "var='" << var << "'" << endl;
+			ss << var << " += ";
+		}
 
 		ss << "(" << r1.now << " " << op << " " << r2.now << ") ";
 		if(r1.now == "")
@@ -1104,9 +1162,17 @@ public:
 		if(r2.now == "")
 			ss << "ERROR(EMPTY '" << e2.toString() << "')";
 
+		if(var != "")
+			ssaft << ";\n";
+
+		ssaft << r1.after;
+		ssaft << r2.after;
+
 		r.before = ssbef.str();
 		r.after  = ssaft.str();
 		r.now    = ss.str();
+
+		cout <<"RESULT(op=" << op << " var='" << var << "')='" << r.now << "'" << endl;
 
 		return r;
 	}
@@ -1223,8 +1289,8 @@ public:
 class Comp: public Boolean
 {
 protected:
-	string op;
 	Expr& e1;
+	string op;
 	Expr& e2;
 public:
 
@@ -1316,8 +1382,8 @@ class BoolOp: public Boolean
 {
 protected:
 	Comp& e1;
-	Comp& e2;
 	string op;
+	Comp& e2;
 public:
 
 	BoolOp(Comp& _e1, string _op, Comp& _e2) :
@@ -1486,12 +1552,18 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
+		cout << "CALL SetCard(var='" << var << "'): " << toString() << endl;
 		GenMIP r;
 		stringstream ss;
+		if(var != "")
+			ss << var << " += ";
 		ss << s1.getName() << ".size() ";
+		if(var != "")
+			ss << ";\n";
 		r.now = ss.str();
+		cout << "RESULT IS: '" << r.now << "'" << endl;
 		return r;
 	}
 
@@ -1646,7 +1718,7 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
 
@@ -1658,11 +1730,12 @@ public:
 		ssbefore << rs.before;
 		ssafter  << rs.after;
 
-		GenMIP rbody = body.toMIP();
+		GenMIP rbody = body.toMIP(var);
 		ssbefore << rbody.before;
 		ssafter  << rbody.after;
 
-		ssbefore << "{\nIloExpr _sumin(env);\n";
+		if(var == "")
+			ssbefore << "{\nIloExpr _sumin(env);\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -1671,12 +1744,14 @@ public:
 		else
 			ssbefore << "double";
  		ssbefore << " " << v.indexToMIP() << ": " << rs.now << ")\n";
-		ssbefore << "\t_sumin += " << rbody.now << ";\n";
-		if(rbody.now == "")
-			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
+		if(var == "")
+			ssnow << "_sumin += ";
+		ssnow << rbody.now;
+		if(var == "")
+			ssnow << ";\n";
 
-		ssnow << "_sumin";
-		ssafter << "}\n";
+		if(var == "")
+			ssafter << "}\n";
 
 		r.before = ssbefore.str();
 		r.now = ssnow.str();
@@ -1738,7 +1813,7 @@ public:
 		return ss.str();
 	}
 
-	virtual GenMIP toMIP() const
+	virtual GenMIP toMIP(string var) const
 	{
 		GenMIP r;
 
@@ -1746,19 +1821,18 @@ public:
 		stringstream ssnow;
 		stringstream ssafter;
 
-		GenMIP rb = begin.toMIP();
+		GenMIP rb = begin.toMIP("");
 		ssbefore << rb.before;
 		ssafter  << rb.after;
 
-		GenMIP re = end.toMIP();
+		GenMIP re = end.toMIP("");
 		ssbefore << re.before;
 		ssafter  << re.after;
 
-		GenMIP rbody = body.toMIP();
-		ssbefore << rbody.before;
-		ssafter  << rbody.after;
+		GenMIP rbody = body.toMIP(var);
 
-		ssbefore << "{\nIloExpr _sumto(env);\n";
+		if(var == "")
+			ssbefore << "{\nIloExpr _sumto(env);\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -1766,13 +1840,20 @@ public:
 			ssbefore << "bool";
 		else
 			ssbefore << "double";
- 		ssbefore << " " << v.indexToMIP() << " = " << rb.now << "; " << v.indexToMIP() << " <= " << re.now << "; ++" << v.indexToMIP() << ")\n";
-		ssbefore << "{\n\t_sumto += " << rbody.now << ";\n}\n";
-		if(rbody.now == "")
-			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
+ 		ssbefore << " " << v.indexToMIP() << " = " << rb.now << "; " << v.indexToMIP() << " <= " << re.now << "; ++" << v.indexToMIP() << ")\n{ // begin for " << v.indexToMIP() << " \n";
+		if(var == "")
+			ssnow << "_sumto += ";
+		ssnow << rbody.now;
+		if(var == "")
+			ssnow  << ";\n";
+		ssafter << "\n} // end for " << v.indexToMIP() << "\n";
+		
+		if(var == "") // _sumto
+			ssafter << "\n} // end _sum scope\n";
 
-		ssnow << "_sumto";
-		ssafter << "}\n";
+
+		ssbefore << rbody.before;
+		ssafter  << rbody.after;
 
 		r.before = ssbefore.str();
 		r.now = ssnow.str();
@@ -1960,11 +2041,11 @@ public:
 		stringstream ssbefore;
 		stringstream ssafter;
 
-		GenMIP rb = begin.toMIP();
+		GenMIP rb = begin.toMIP("");
 		ssbefore << rb.before;
 		ssafter  << rb.after;
 
-		GenMIP re = end.toMIP();
+		GenMIP re = end.toMIP("");
 		ssbefore << re.before;
 		ssafter  << re.after;
 
@@ -2058,7 +2139,7 @@ public:
 		ss << retFA.before;
 		// unused retFA.now
 
-		GenMIP retRhs = rhs.toMIP();
+		GenMIP retRhs = rhs.toMIP("");
 		ss << retRhs.before;
 		if(retRhs.now == "")
 			ss << "MIPCons::toMIP:ERROR! empty rhs.now = '" << rhs.toString() << "'" << endl;
@@ -2066,7 +2147,7 @@ public:
 		ss << "IloExpr " << name << "(env);\n";
 		ss << retRhs.after;
 
-		GenMIP retLhs = lhs.toMIP();
+		GenMIP retLhs = lhs.toMIP("");
 		ss << retLhs.before;
 		if(retLhs.now == "")
 			ss << "MIPCons::toMIP:ERROR! empty lhs.now = '" << lhs.toString() << "'" << endl;
@@ -2345,7 +2426,7 @@ public:
 		ss << "IloExpr " << obj->exprName << "(env);\n";
 
 		ss << "// " << obj->toLatex() << endl;
-		GenMIP exprobj = obj->toMIP();
+		GenMIP exprobj = obj->toMIP(obj->exprName);
 		ss << exprobj.before;
 		ss << obj->exprName << " += " << exprobj.now << ";\n";
 		ss << exprobj.after;

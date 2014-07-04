@@ -23,8 +23,8 @@ using namespace std;
 class MIPVarArray
 {
 protected:
-	vector<MIPVar*> v;
 	string name;
+	vector<MIPVar*> v;
 
 public:
 	MIPVarArray(string _name="") :
@@ -62,6 +62,7 @@ public:
 	inline MIPVarArray& setName(string _name)
 	{
 		name = _name;
+		return *this;
 	}
 
 	void renameVars()
@@ -134,8 +135,8 @@ public:
 class MIPVarArray2
 {
 protected:
-	vector<MIPVarArray*> v;
 	string name;
+	vector<MIPVarArray*> v;
 
 public:
 	MIPVarArray2(string _name="") :
@@ -174,6 +175,7 @@ public:
 	inline MIPVarArray2& setName(string _name)
 	{
 		name = _name;
+		return *this;
 	}
 
 	void renameVars()
@@ -239,8 +241,8 @@ public:
 class MIPVarArray3
 {
 protected:
-	vector<MIPVarArray2*> v;
 	string name;
+	vector<MIPVarArray2*> v;
 
 public:
 	MIPVarArray3(string _name="") :
@@ -279,6 +281,7 @@ public:
 	inline MIPVarArray3& setName(string _name)
 	{
 		name = _name;
+		return *this;
 	}
 
 	void renameVars()
@@ -346,8 +349,8 @@ public:
 class MIPVarArray4
 {
 protected:
-	vector<MIPVarArray3*> v;
 	string name;
+	vector<MIPVarArray3*> v;
 
 public:
 	MIPVarArray4(string _name="") :
@@ -386,6 +389,7 @@ public:
 	inline MIPVarArray4& setName(string _name)
 	{
 		name = _name;
+		return *this;
 	}
 
 	void renameVars()
@@ -453,8 +457,8 @@ public:
 class MIPVarArray5
 {
 protected:
-	vector<MIPVarArray4*> v;
 	string name;
+	vector<MIPVarArray4*> v;
 
 public:
 	MIPVarArray5(string _name="") :
@@ -493,6 +497,7 @@ public:
 	inline MIPVarArray5& setName(string _name)
 	{
 		name = _name;
+		return *this;
 	}
 
 	void renameVars()
