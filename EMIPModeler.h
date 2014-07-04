@@ -1695,6 +1695,27 @@ public:
 		return ss.str();
 	}
 
+	virtual string toLatex() const
+	{
+		stringstream ss;
+		ss << "If $" << condition.toLatex() << "$ then: \\\n";
+		ss << "\\begin{align}\n";
+		for(int i = 0; i < ((int) vif.size()); ++i)
+			ss << vif[i]->toLatex(i != ((int) vif.size()) - 1) << endl;
+		ss << "\\end{align}\n";
+
+		if(velse.size() == 0)
+			return ss.str();
+
+		ss << "Else: \\\n";
+		ss << "\\begin{align}\n";
+		for(int i = 0; i < ((int) velse.size()); ++i)
+			ss << velse[i]->toLatex(i != ((int) velse.size()) - 1) << endl;
+		ss << "\\end{align}\n";
+
+		return ss.str();
+	}
+
 	virtual IfElse& clone() const
 	{
 		return * new IfElse(*this);
@@ -1802,6 +1823,9 @@ public:
 		for(int i = 0; i < ((int) constraints.size()); ++i)
 			ss << constraints[i]->toLatex(i != ((int) constraints.size()) - 1) << endl;
 		ss << "\\end{align}\n";
+
+		for(unsigned j=0; j<condCons.size(); ++j)
+			ss << condCons[j]->toLatex() << endl;
 
 		return ss.str();
 	}
