@@ -38,7 +38,7 @@ enum Type
 
 enum Id
 {
-	IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse
+	IdExpr, IdVar, IdVar1Index, IdVar2Index, IdVar3Index, IdVar4Index, IdVar5Index, IdPar, IdPar1Index, IdPar2Index, IdPar3Index, IdPar4Index, IdPar5Index, IdNum, IdOp, IdMultiOp, IdComp, IdBoolOp, IdBool, IdNot, IdSet, IdSetElem, IdSetSet, IdSetSetElem, IdSetCard, IdSetOp, IdSum, IdSumIn, IdSumTo, IdForAll, IdForAllIn, IdForAllTo, IdCons, IdIfElse
 };
 
 struct GenMIP
@@ -1467,7 +1467,106 @@ public:
 };
 
 
+class SetSet
+{
+public://protected:
+	string name;
+
+public:
+
+	SetSet(string _name) :
+			name(_name)
+	{
+	}
+
+	virtual ~SetSet()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSetSet;
+	}
+
+	string getName() const
+	{
+		return name;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSetSet('" << name << "') ";
+		return ss.str();
+	}
+
+	virtual string toLatex(bool br = true) const
+	{
+		stringstream ss;
+		ss << name << " ";
+		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		r.now = name;
+		return r;
+	}
+
+	virtual SetSet& clone() const
+	{
+		return *new SetSet(name);
+	}
+};
+
+
 // TODO: create MIPRange{n1..n2} : Set
+
+// THIS IS THE ELEMENT OF A SET OF SETS
+class SetSetElem: public Set
+{
+protected:
+	Expr& elem;
+	SetSet& sset;
+
+public:
+
+	SetSetElem(const SetSet& _sset, const Expr& _elem) :
+			Set("anonSetSet"), elem(_elem.clone()), sset(_sset.clone())
+	{
+	}
+
+	virtual ~SetSetElem()
+	{
+	}
+
+	virtual Id id() const
+	{
+		return IdSetSetElem;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPSetSetElem(" << sset.name << "(" << elem.toString() << ")) ";
+		return ss.str();
+	}
+
+	virtual string toLatex(bool br = true) const
+	{
+		stringstream ss;
+		ss << sset.name << "(" << elem.toLatex() << ") ";
+		return ss.str();
+	}
+
+	virtual Set& clone() const
+	{
+		return *new SetSetElem(sset, elem);
+	}
+};
+
+
 
 class SetElem: public Set
 {

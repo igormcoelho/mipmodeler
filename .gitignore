@@ -5,3 +5,4 @@ emipmodel
 .project
 .cproject
 model.c
+smain.cpp
