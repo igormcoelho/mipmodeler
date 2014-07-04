@@ -87,10 +87,41 @@ Modeler& knapsack()
 	return mk.clone();
 }
 
+Modeler& tsp()
+{
+	Modeler mk(EMIP::Minimize);
+	
+	INDEX i = Index("i", Integer);
+	INDEX j = Index("j", Integer);
+	SET S = Set("S");
+
+	EXPR body_obj = Op(Par2Index("c", i, j), '*', Var2Index("x", i, j));
+
+	EXPR sumObj1 = SumTo(SumIn(j, S, body_obj));
+	EXPR sumObj2 = SumTo(SumIn(i, S, sumObj1, "objfunc"));
+	cout << "name: " << sumObj2.exprName << endl;
+
+	mk.setObj(sumObj2);
+
+	//cout << sumObj.toLatex() << endl;
+
+	// --------------
+
+	FORALL faC1 = ForAllTo(ForAllIn(i, S));
+	EXPR bodyC1 = Var2Index("x", Num(0), i);
+
+	CONS c1 = Cons("c1", faC1, bodyC1, '<', Num(1));
+
+
+	mk.addCons(c1);
+
+	return mk.clone();
+}
+
 
 int main()
 {
-    Modeler& mk = knapsack();
+    Modeler& mk = tsp();
     cout << "EMIP tree structure:" << endl;
     mk.print();
 

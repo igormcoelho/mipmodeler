@@ -433,6 +433,30 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		stringstream ss;
+		stringstream ssbef;
+		stringstream ssaft;
+
+		GenMIP ri1 = i1.toMIP();
+		GenMIP ri2 = i2.toMIP();
+
+		ssbef << ri1.before;
+		ssbef << ri2.before;
+		r.before = ssbef.str();
+
+		ss << name << "[" << ri1.now << "][" << ri2.now << "]";
+		r.now = ss.str();
+
+		ssaft << ri1.after;
+		ssaft << ri2.after;
+
+		r.after = ssaft.str();
+		return r;
+	}
+
 	virtual Var& cloneVar() const
 	{
 		return *new Var2Index(name, i1, i2, type);
@@ -809,6 +833,30 @@ public:
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "}";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		stringstream ss;
+		stringstream ssbef;
+		stringstream ssaft;
+
+		GenMIP ri1 = i1.toMIP();
+		GenMIP ri2 = i2.toMIP();
+
+		ssbef << ri1.before;
+		ssbef << ri2.before;
+		r.before = ssbef.str();
+
+		ss << name << "[" << ri1.now << "][" << ri2.now << "]";
+		r.now = ss.str();
+
+		ssaft << ri1.after;
+		ssaft << ri2.after;
+
+		r.after = ssaft.str();
+		return r;
 	}
 
 	virtual Expr& clone() const
@@ -1594,7 +1642,7 @@ public:
 	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\sum_{" << v.toLatex() << " \\in " << s.toLatex(false) << "}{" << body.toLatex(false) << "} ";
+		ss << "\\sum_{" << v.toLatex() << " \\in " << s.toLatex(false) << "}" << body.toLatex(false) << " ";
 		return ss.str();
 	}
 
@@ -1686,7 +1734,7 @@ public:
 	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << "\\sum_{" << v.toLatex() << " = " << begin.toLatex(false) << "}^{" << end.toLatex(false) << "}{" << body.toLatex(false) << "} ";
+		ss << "\\sum_{" << v.toLatex() << " = " << begin.toLatex(false) << "}^{" << end.toLatex(false) << "}" << body.toLatex(false) << " ";
 		return ss.str();
 	}
 
@@ -2339,6 +2387,7 @@ typedef const Var& VAR;
 typedef const Par& PAR;
 typedef const Boolean& BOOLEAN;
 typedef const Set& SET;
+typedef const ForAll& FORALL;
 typedef const Cons& CONS;
 typedef const IfElse& IFELSE;
 typedef const Modeler& MODELER;
