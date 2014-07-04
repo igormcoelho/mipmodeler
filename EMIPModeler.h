@@ -2341,10 +2341,10 @@ public:
 
 		stringstream ss;
 		ss << "IloEnv env;\n";
-		ss << "IloModel model(env);\n";
-		ss << "\n\n";
+		ss << "IloModel model(env);\n\n";
 		ss << "IloExpr " << obj->exprName << "(env);\n";
 
+		ss << "// " << obj->toLatex() << endl;
 		GenMIP exprobj = obj->toMIP();
 		ss << exprobj.before;
 		ss << obj->exprName << " += " << exprobj.now << ";\n";
@@ -2362,7 +2362,7 @@ public:
 
 		for(unsigned i=0; i<constraints.size(); i++)
 		{
-			//ss << "// constraints: " << constraints[i]->toString() << endl; 
+			ss << "// constraints: " << constraints[i]->toLatex(false) << endl; 
 			ss << constraints[i]->toMIP() << endl;
 		}
 
