@@ -8,15 +8,15 @@
 
 #include<iostream>
 
-#include "EMIPModel.h"
+#include "EMIPModeler.h"
 
 using namespace std;
 using namespace EMIP;
 
 
-Model& knapsack()
+Modeler& knapsack()
 {
-	Model mk(EMIP::Maximize);
+	Modeler mk(EMIP::Maximize);
 
 	VAR vi = Var("i");
 
@@ -44,7 +44,7 @@ Model& knapsack()
 
 int main()
 {
-    Model& mk = knapsack();
+    Modeler& mk = knapsack();
     mk.print();
 
     cout << endl;

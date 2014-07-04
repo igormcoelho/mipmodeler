@@ -6,8 +6,8 @@
 // Copyleft 2014 - Gnu Public License v3 - GPLv3
 // ==================================================
 
-#ifndef EMIPMODEL_HPP
-#define EMIPMODEL_HPP
+#ifndef EMIPMODELER_HPP
+#define EMIPMODELER_HPP
 
 #include<iostream>
 #include<sstream>
@@ -1687,7 +1687,7 @@ public:
 	}
 };
 
-class Model
+class Modeler
 {
 protected:
 	ProblemType type;
@@ -1696,7 +1696,7 @@ protected:
 
 public:
 
-	Model(const Model& model) :
+	Modeler(const Modeler& model) :
 			type(model.type)
 	{
 		obj = model.obj;
@@ -1706,21 +1706,21 @@ public:
 			constraints.push_back(&model.constraints[i]->clone());
 	}
 
-	Model(ProblemType _type) :
+	Modeler(ProblemType _type) :
 			type(_type), obj(NULL)
 	{
 	}
 
-	Model(ProblemType _type, const Expr& _obj) :
+	Modeler(ProblemType _type, const Expr& _obj) :
 			type(_type), obj(&_obj.clone())
 	{
 	}
 
-	virtual ~Model()
+	virtual ~Modeler()
 	{
 	}
 
-	Model& setObj(const Expr& _obj)
+	Modeler& setObj(const Expr& _obj)
 	{
 		if(obj)
 			delete obj;
@@ -1730,7 +1730,7 @@ public:
 		return *this;
 	}
 
-	Model& addCons(const Cons& cons)
+	Modeler& addCons(const Cons& cons)
 	{
 		constraints.push_back(&cons.clone());
 		return *this;
@@ -1803,9 +1803,9 @@ public:
 		cout << toString() << endl;
 	}
 
-	virtual Model& clone() const
+	virtual Modeler& clone() const
 	{
-		return *new Model(*this);
+		return *new Modeler(*this);
 	}
 };
 
@@ -1816,7 +1816,7 @@ typedef const Par& PAR;
 typedef const Bool& BOOL;
 typedef const Set& SET;
 typedef const Cons& CONS;
-typedef const Model& MODEL;
+typedef const Modeler& MODELER;
 
 }
 
