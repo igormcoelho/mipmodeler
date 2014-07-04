@@ -10,8 +10,37 @@
 
 #include "EMIPModeler.h"
 
+#include "MIPModel.h"
+#include "MIPVarArray.h"
+
 using namespace std;
 using namespace EMIP;
+
+MIPModel mipk()
+{
+	MIPModel model(MIPMaximize);
+
+	unsigned N = 10;
+	vector<double> p(N, 1.0);
+	vector<double> w(N, 2.0);
+	int C = 8;
+
+	MIPVarArray x(N, "x");
+	for(unsigned i=0; i<N; ++i)
+		x[i] = MIPVar(MIPBinary, 0, 1);
+	x.renameVars();
+
+	for(unsigned i=0; i<N; ++i)
+		model.add(p[i], x[i]);
+
+	MIPCons cap("capacity", '<', C);
+	for(unsigned i=0; i<N; ++i)
+		cap.add(w[i], x[i]);
+
+	model.add(cap);
+
+	return model;
+}
 
 
 Modeler& knapsack()
