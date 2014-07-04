@@ -1614,7 +1614,7 @@ public:
 		ssbefore << rbody.before;
 		ssafter  << rbody.after;
 
-		ssbefore << "int sumin = 0;\n";
+		ssbefore << "{\nint _sumin = 0;\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -1623,13 +1623,12 @@ public:
 		else
 			ssbefore << "double";
  		ssbefore << " " << v.indexToMIP() << ": " << rs.now << ")\n";
-		ssbefore << "{\n";
-		ssbefore << "\tsumin += " << rbody.now << ";\n";
+		ssbefore << "\t_sumin += " << rbody.now << ";\n";
 		if(rbody.now == "")
 			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
-		ssbefore << "}\n";
 
-		ssnow << "sumin";
+		ssnow << "_sumin";
+		ssafter << "}\n";
 
 		r.before = ssbefore.str();
 		r.now = ssnow.str();
@@ -1711,7 +1710,7 @@ public:
 		ssbefore << rbody.before;
 		ssafter  << rbody.after;
 
-		ssbefore << "IloExpr sumin;\n";
+		ssbefore << "{\nIloExpr _sumto;\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -1720,13 +1719,12 @@ public:
 		else
 			ssbefore << "double";
  		ssbefore << " " << v.indexToMIP() << " = " << rb.now << "; " << v.indexToMIP() << " <= " << re.now << "; ++" << v.indexToMIP() << ")\n";
-		ssbefore << "{\n";
-		ssbefore << "\tsumin += " << rbody.now << ";\n";
+		ssbefore << "\t_sumto += " << rbody.now << ";\n";
 		if(rbody.now == "")
 			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
-		ssbefore << "}\n";
 
-		ssnow << "sumin";
+		ssnow << "_sumto";
+		ssafter << "}\n";
 
 		r.before = ssbefore.str();
 		r.now = ssnow.str();
@@ -2241,18 +2239,12 @@ public:
 		ss << "\n\n";
 		ss << "IloExpr " << obj->exprName << "(env);\n";
 
-		ss << "{\n";
 		GenMIP exprobj = obj->toMIP();
 		ss << exprobj.before;
 		ss << obj->exprName << " += " << exprobj.now << ";\n";
-		if(exprobj.after != "")
-		{
-			cout << "ERROR: UNEXPECTED EXTRA STUFF AFTER OBJ: '" << exprobj.after << "'" << endl;
-			exit(1);
-		}
-		ss << "}\n\n";
-		
+		ss << exprobj.after;
 
+		ss << "\n";
 		ss << "model.add(";
 		if(type == Minimize)
 			ss << "IloMinimize";
