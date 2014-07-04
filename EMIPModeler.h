@@ -1782,7 +1782,7 @@ public:
 
 class ForAllIn: public ForAll
 {
-protected:
+public://protected:
 	Index& v;
 	Set& s;
 	Boolean& st; // such that
@@ -1822,6 +1822,34 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+
+		stringstream ssbefore;
+		stringstream ssafter;
+
+		GenMIP rs = s.toMIP();
+		ssbefore << rs.before;
+		ssafter  << rs.after;
+
+		ssbefore << "for(";
+		if(v.type == Integer)
+			ssbefore << "int";
+		else if(v.type == Binary)
+			ssbefore << "bool";
+		else
+			ssbefore << "double";
+ 		ssbefore << " " << v.indexToMIP() << ": " << rs.now << ")\n";
+		ssbefore << "{\n";
+		ssafter << "}\n";
+
+		r.before = ssbefore.str();
+		r.after = ssafter.str();
+
+		return r;
+	}
+
 	virtual ForAll& clone() const
 	{
 		return *new ForAllIn(v, s, st);
@@ -1830,12 +1858,18 @@ public:
 
 class ForAllTo: public ForAll
 {
-protected:
+public://protected:
 	Index& v;
 	Expr& begin;
 	Expr& end;
 	Boolean& st; // such that
 public:
+
+	ForAllTo(const ForAllIn& sin, int start = 0) :
+		v(sin.v.cloneIndex()), begin(* new Num(start)), end(start==0?(Expr&)* new Op(SetCard(sin.s), '-', Num(1)):(Expr&)* new SetCard(sin.s)), st(sin.st.clone())
+	{
+	}
+
 	ForAllTo(const Index& _v, const Expr& _begin, const Expr& _end) :
 			v(_v.cloneIndex()), begin(_begin.clone()), end(_end.clone()), st(*new Boolean)
 	{
@@ -1873,11 +1907,34 @@ public:
 
 	virtual GenMIP toMIP() const
 	{
-		GenMIP ret;
+		GenMIP r;
 
+		stringstream ssbefore;
+		stringstream ssafter;
 
+		GenMIP rb = begin.toMIP();
+		ssbefore << rb.before;
+		ssafter  << rb.after;
 
-		return ret;
+		GenMIP re = end.toMIP();
+		ssbefore << re.before;
+		ssafter  << re.after;
+
+		ssbefore << "for(";
+		if(v.type == Integer)
+			ssbefore << "int";
+		else if(v.type == Binary)
+			ssbefore << "bool";
+		else
+			ssbefore << "double";
+ 		ssbefore << " " << v.indexToMIP() << " = " << rb.now << "; " << v.indexToMIP() << " <= " << re.now << "; ++" << v.indexToMIP() << ")\n";
+		ssbefore << "{\n";
+		ssafter << "}\n";
+
+		r.before = ssbefore.str();
+		r.after = ssafter.str();
+
+		return r;
 	}
 
 	virtual ForAll& clone() const
