@@ -150,7 +150,6 @@ public:
 		else
 			ss << d;
 		r.now = ss.str();
-		cout << "NUM('" << var << "')='" << r.now << "'" << endl;
 		return r;
 	}
 
@@ -482,7 +481,7 @@ public:
 
 
 		if(var != "")
-			ssaft << ";\n";
+			ssaft << "; /* ';' from Var2Index */\n";
 		ssaft << ri1.after;
 		ssaft << ri2.after;
 
@@ -901,7 +900,7 @@ public:
 
 
 		if(var != "")
-			ssaft << ";\n";
+			ssaft << "; /* ';' from Par2Index */\n";
 		ssaft << ri1.after;
 		ssaft << ri2.after;
 
@@ -1136,7 +1135,7 @@ public:
 
 	virtual GenMIP toMIP(string var) const
 	{
-		cout <<"CALL OP(var='" << var << "'): " << toString() << endl;
+
 		GenMIP r;
 		stringstream ss;
 		stringstream ssbef;
@@ -1158,7 +1157,7 @@ public:
 			ss << "ERROR(EMPTY '" << e2.toString() << "')";
 
 		if(var != "")
-			ssaft << ";\n";
+			ss << "; /* ';' from op " << op << " */\n";
 
 		ssaft << r1.after;
 		ssaft << r2.after;
@@ -1166,8 +1165,6 @@ public:
 		r.before = ssbef.str();
 		r.after  = ssaft.str();
 		r.now    = ss.str();
-
-		cout <<"RESULT(op=" << op << " var='" << var << "')='" << r.now << "'" << endl;
 
 		return r;
 	}
@@ -1549,7 +1546,6 @@ public:
 
 	virtual GenMIP toMIP(string var) const
 	{
-		cout << "CALL SetCard(var='" << var << "'): " << toString() << endl;
 		GenMIP r;
 		stringstream ss;
 		if(var != "")
@@ -1558,7 +1554,6 @@ public:
 		if(var != "")
 			ss << ";\n";
 		r.now = ss.str();
-		cout << "RESULT IS: '" << r.now << "'" << endl;
 		return r;
 	}
 
@@ -1840,7 +1835,7 @@ public:
 			ssnow << "_sumto += ";
 		ssnow << rbody.now;
 		if(var == "")
-			ssnow  << ";\n";
+			ssnow  << "; /* ';' from for " << v.indexToMIP() << " */\n";
 		ssafter << "\n} // end for " << v.indexToMIP() << "\n";
 		
 		if(var == "") // _sumto
