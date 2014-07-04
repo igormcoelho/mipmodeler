@@ -82,6 +82,12 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		return r;
+	}
+
 	virtual void print() const
 	{
 		std::cout << toString() << std::endl;
@@ -195,12 +201,12 @@ public:
 
 	virtual Expr& clone() const
 	{
-		return cloneVar();
+		return cloneIndex();
 	}
 
-	virtual Var& cloneVar() const
+	virtual Index& cloneIndex() const
 	{
-		return *new Var(name, type);
+		return *new Index(name, type);
 	}
 };
 
@@ -1544,6 +1550,12 @@ public:
 		return "";
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		return r;
+	}
+
 	virtual ForAll& clone() const
 	{
 		return *new ForAll;
@@ -1712,10 +1724,12 @@ public:
 		return ss.str();
 	}
 
-	virtual string toMIP(bool linebreak) const
+	virtual string toMIP() const
 	{
 		if(name == "")
 			return "";
+
+		stringstream ss;
 
 		GenMIP retFA = fa.toMIP();
 		ss << retFA.before << endl;
@@ -1954,12 +1968,10 @@ public:
 			ss << "MIPMinimize";
 		else
 			ss << "MIPMaximize";
-		ss << ");\n";
-		ss << "IloModel model(env)\n";
-		ss << "\n\n";
-		ss << "IloExpr objective(env);\n";
+		ss << ");\n\n";
 
-		ss << "model.add(IloMaximize(env, objective));\n";
+		for(unsigned i=0; i<constraints.size(); i++)
+			ss << constraints[i]->toMIP() << endl;
 
 		return ss.str();
 	}
