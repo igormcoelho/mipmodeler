@@ -1614,7 +1614,7 @@ public:
 		ssbefore << rbody.before;
 		ssafter  << rbody.after;
 
-		ssbefore << "{\nint _sumin = 0;\n";
+		ssbefore << "{\nIloExpr _sumin(env);\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -1710,7 +1710,7 @@ public:
 		ssbefore << rbody.before;
 		ssafter  << rbody.after;
 
-		ssbefore << "{\nIloExpr _sumto;\n";
+		ssbefore << "{\nIloExpr _sumto(env);\n";
 		ssbefore << "for(";
 		if(v.type == Integer)
 			ssbefore << "int";
@@ -2015,7 +2015,7 @@ public:
 		if(retRhs.now == "")
 			ss << "MIPCons::toMIP:ERROR! empty rhs.now = '" << rhs.toString() << "'" << endl;
 
-		ss << "IloCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
+		ss << "IloExpr " << name << "(env);\n";
 		ss << retRhs.after;
 
 		GenMIP retLhs = lhs.toMIP();
@@ -2023,8 +2023,9 @@ public:
 		if(retLhs.now == "")
 			ss << "MIPCons::toMIP:ERROR! empty lhs.now = '" << lhs.toString() << "'" << endl;
 
-		ss << name << " = " << retLhs.now << ";\n";
+		ss << name << " += " << retLhs.now << ";\n";
 		ss << retLhs.after;
+		ss << "model.add(" << name << " " << signal << " " << retRhs.now << ");\n";
 
 		ss << retFA.after;
 
@@ -2313,7 +2314,7 @@ public:
 
 		for(unsigned i=0; i<constraints.size(); i++)
 		{
-			ss << "// constraints: " << constraints[i]->toString() << endl; 
+			//ss << "// constraints: " << constraints[i]->toString() << endl; 
 			ss << constraints[i]->toMIP() << endl;
 		}
 
