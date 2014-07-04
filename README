@@ -1,6 +1,6 @@
 MIP and EMIP modelers
 Automatic code derivation for LaTeX, CPLEX Concert, UFFLP, and others...
 
-LICENSE: LGPLv3
+LICENSE: MIP (LGPLv3) and EMIP (GPLv3)
 AUTHOR: Igor Machado Coelho
 Copyleft 2014

@@ -1,3 +1,11 @@
+// =========================================
+// Simple class for MIP modeling
+//
+// Author: Igor Machado Coelho
+//
+// Copyleft 2014 - LGPLv3 (Gnu Lesser GPLv3)
+// =========================================
+
 #ifndef MIPVARARRAY
 #define MIPVARARRAY
 

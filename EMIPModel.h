@@ -3,7 +3,7 @@
 //
 // Author: Igor Machado Coelho
 //
-// Copyleft 2014 - LGPLv3
+// Copyleft 2014 - Gnu Public License v3 - GPLv3
 // ==================================================
 
 #ifndef EMIPMODEL_HPP

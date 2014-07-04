@@ -1,10 +1,10 @@
-// ==============================
-// Simple class for MIP modeling
+// ==================================================
+// Class for MIP modeling and automatic code deriving
 //
 // Author: Igor Machado Coelho
 //
-// Copyleft 2014 - LGPLv3
-// ==============================
+// Copyleft 2014 - Gnu Public License v3 - GPLv3
+// ==================================================
 
 #include<iostream>
 
