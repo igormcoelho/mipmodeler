@@ -30,7 +30,7 @@ enum ProblemType
 	Minimize, Maximize
 };
 
-enum VarType
+enum Type
 {
 	Real, Binary, Integer, Unknown
 };
@@ -144,11 +144,11 @@ public:
 class Var: public Expr
 {
 protected:
-	VarType type;
+	Type type;
 	string name;
 public:
 
-	Var(string _name, VarType _type = Unknown) :
+	Var(string _name, Type _type = Unknown) :
 			type(_type), name(_name)
 	{
 	}
@@ -229,7 +229,7 @@ protected:
 	Expr& i1;
 public:
 
-	Var1Index(string _name, const Expr& _i1, VarType _type = Unknown) :
+	Var1Index(string _name, const Expr& _i1, Type _type = Unknown) :
 			Var(_name, _type), i1(_i1.clone())
 	{
 	}
@@ -281,7 +281,7 @@ protected:
 	Expr& i2;
 public:
 
-	Var2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Unknown) :
+	Var2Index(string _name, const Expr& _i1, const Expr& _i2, Type _type = Unknown) :
 			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
@@ -334,7 +334,7 @@ protected:
 	Expr& i3;
 public:
 
-	Var3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Unknown) :
+	Var3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, Type _type = Unknown) :
 			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
@@ -389,7 +389,7 @@ protected:
 	Expr& i4;
 public:
 
-	Var4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Unknown) :
+	Var4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, Type _type = Unknown) :
 			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
@@ -446,7 +446,7 @@ protected:
 	Expr& i5;
 public:
 
-	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, const Expr& _i5, VarType _type = Unknown) :
+	Var5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, const Expr& _i5, Type _type = Unknown) :
 			Var(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
@@ -497,11 +497,11 @@ public:
 class Par: public Expr
 {
 protected:
-	VarType type;
+	Type type;
 	string name;
 public:
 
-	Par(string _name, VarType _type = Unknown) :
+	Par(string _name, Type _type = Unknown) :
 			type(_type), name(_name)
 	{
 	}
@@ -577,7 +577,7 @@ protected:
 	Expr& i1;
 public:
 
-	Par1Index(string _name, const Expr& _i1, VarType _type = Unknown) :
+	Par1Index(string _name, const Expr& _i1, Type _type = Unknown) :
 			Par(_name, _type), i1(_i1.clone())
 	{
 	}
@@ -629,7 +629,7 @@ protected:
 	Expr& i2;
 public:
 
-	Par2Index(string _name, const Expr& _i1, const Expr& _i2, VarType _type = Unknown) :
+	Par2Index(string _name, const Expr& _i1, const Expr& _i2, Type _type = Unknown) :
 			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone())
 	{
 	}
@@ -682,7 +682,7 @@ protected:
 	Expr& i3;
 public:
 
-	Par3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, VarType _type = Unknown) :
+	Par3Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, Type _type = Unknown) :
 			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone())
 	{
 	}
@@ -737,7 +737,7 @@ protected:
 	Expr& i4;
 public:
 
-	Par4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, VarType _type = Unknown) :
+	Par4Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, Type _type = Unknown) :
 			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone())
 	{
 	}
@@ -794,7 +794,7 @@ protected:
 	Expr& i5;
 public:
 
-	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, const Expr& _i5, VarType _type = Unknown) :
+	Par5Index(string _name, const Expr& _i1, const Expr& _i2, const Expr& _i3, const Expr& _i4, const Expr& _i5, Type _type = Unknown) :
 			Par(_name, _type), i1(_i1.clone()), i2(_i2.clone()), i3(_i3.clone()), i4(_i4.clone()), i5(_i5.clone())
 	{
 	}
