@@ -148,6 +148,79 @@ public:
 	}
 };
 
+class Index: public Expr
+{
+protected:
+	Type type;
+	string name;
+public:
+
+	Index(string _name, Type _type) :
+			type(_type), name(_name)
+	{
+	}
+
+	virtual ~Index()
+	{
+	}
+
+	inline bool isInteger() const
+	{
+		return type == Integer;
+	}
+
+	inline bool isBinary() const
+	{
+		return type == Binary;
+	}
+
+	inline bool isReal() const
+	{
+		return type == Real;
+	}
+
+	virtual Id id() const
+	{
+		return IdVar;
+	}
+
+	virtual string toString() const
+	{
+		stringstream ss;
+		ss << "EMIPIndex(";
+		if(isInteger())
+			ss << "Integer,";
+		else if(isBinary())
+			ss << "Binary,";
+		else if(isReal())
+			ss << "Real,";
+		else
+			ss << "";
+		ss << "'" << name << "')";
+
+		return ss.str();
+	}
+
+	virtual string toLatex(bool br = true) const
+	{
+		stringstream ss;
+		ss << name;
+		return ss.str();
+	}
+
+	virtual Expr& clone() const
+	{
+		return cloneVar();
+	}
+
+	virtual Var& cloneVar() const
+	{
+		return *new Var(name, type);
+	}
+};
+
+
+
 class Var: public Expr
 {
 protected:
