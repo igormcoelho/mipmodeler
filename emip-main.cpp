@@ -133,7 +133,15 @@ int main()
     cout << endl << endl;
 
     cout << "MIP:" << endl;
-    cout << mk.toMIP() << endl;
+    string mstr = mk.toMIP();
+    FILE* cmodel = fopen("model.c", "w");
+    fprintf(cmodel, "#include<iostream>\nint main()\n{\n");
+    fprintf(cmodel, "%s\n", mstr.c_str());
+    fprintf(cmodel, "return 0;\n}\n");
+    fclose(cmodel);
+
+    system("indent model.c");
+    system("cat model.c");
 
     cout << "Finished successfully!" << endl;
 

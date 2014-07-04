@@ -1767,7 +1767,7 @@ public:
 		else
 			ssbefore << "double";
  		ssbefore << " " << v.indexToMIP() << " = " << rb.now << "; " << v.indexToMIP() << " <= " << re.now << "; ++" << v.indexToMIP() << ")\n";
-		ssbefore << "\t_sumto += " << rbody.now << ";\n";
+		ssbefore << "{\n\t_sumto += " << rbody.now << ";\n}\n";
 		if(rbody.now == "")
 			ssbefore << "ERROR(EMPTY '" << body.toString() << "')";
 
@@ -2341,7 +2341,7 @@ public:
 
 		stringstream ss;
 		ss << "IloEnv env;\n";
-		ss << "IloModel model(env)\n";
+		ss << "IloModel model(env);\n";
 		ss << "\n\n";
 		ss << "IloExpr " << obj->exprName << "(env);\n";
 
