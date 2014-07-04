@@ -1148,13 +1148,8 @@ public:
 		GenMIP r2 = e2.toMIP("");
 		ssbef << r2.before;
 
-		unsigned size = var.size();
-		if(size != 0);
-		{
-			cout << "VAR LENGTH != 0 => " << size << endl;
-			cout << "var='" << var << "'" << endl;
+		if(var != "")
 			ss << var << " += ";
-		}
 
 		ss << "(" << r1.now << " " << op << " " << r2.now << ") ";
 		if(r1.now == "")
