@@ -146,7 +146,7 @@ public:
 		GenMIP r;
 		stringstream ss;
 		if(var != "")
-			ss << var << " += " << d << ";\n";
+			ss << var << " += " << d << "; /* ';' added by Num */\n";
 		else
 			ss << d;
 		r.now = ss.str();
@@ -220,7 +220,7 @@ public:
 		else
 		{
 			stringstream ss;
-			ss << var << " += " << name << ";\n";
+			ss << var << " += " << name << "; /* ';' added by Index */\n";
 		}
 		return r;
 	}
@@ -329,7 +329,7 @@ public:
 		else
 		{
 			stringstream ss;
-			ss << var << " += " << name << ";\n";
+			ss << var << " += " << name << "; /* ';' added by Var */\n";
 		}
 		return r;
 	}
@@ -402,7 +402,7 @@ public:
 		r.now = ss.str();
 		stringstream ssaft;
 		if(var != "")
-			ssaft << ";\n";
+			ssaft << "; /* ';' added by Var1Index */\n";
 		ssaft << ri1.after;
 		r.after = ssaft.str();
 		return r;
@@ -742,7 +742,7 @@ public:
 		else
 		{
 			stringstream ss;
-			ss << var << " += " << name << ";\n";
+			ss << var << " += " << name << "; /* ';' added by Par */\n";
 		}
 		return r;
 	}
@@ -815,7 +815,7 @@ public:
 		r.now = ss.str();
 		stringstream ssaft;
 		if(var != "")
-			ssaft << ";\n";
+			ssaft << "; /* ';' added by Par1Index */\n";
 		ssaft << ri1.after;
 		r.after = ssaft.str();
 		return r;
@@ -1165,6 +1165,7 @@ public:
 		r.before = ssbef.str();
 		r.after  = ssaft.str();
 		r.now    = ss.str();
+
 
 		return r;
 	}
@@ -1552,7 +1553,7 @@ public:
 			ss << var << " += ";
 		ss << s1.getName() << ".size() ";
 		if(var != "")
-			ss << ";\n";
+			ss << "; /* ';' added by Card */\n";
 		r.now = ss.str();
 		return r;
 	}
@@ -2142,7 +2143,7 @@ public:
 		if(retLhs.now == "")
 			ss << "MIPCons::toMIP:ERROR! empty lhs.now = '" << lhs.toString() << "'" << endl;
 
-		ss << name << " += " << retLhs.now << ";\n";
+		ss << name << " += " << retLhs.now << "; /* ';' added by Cons '" << name << "' */ \n";
 		ss << retLhs.after;
 		ss << "model.add(" << name << " " << signal << " " << retRhs.now << ");\n";
 
@@ -2418,7 +2419,7 @@ public:
 		ss << "// " << obj->toLatex() << endl;
 		GenMIP exprobj = obj->toMIP(obj->exprName);
 		ss << exprobj.before;
-		ss << obj->exprName << " += " << exprobj.now << ";\n";
+		ss << exprobj.now;
 		ss << exprobj.after;
 
 		ss << "\n";
