@@ -97,7 +97,7 @@ Modeler& tsp()
 
 	EXPR body_obj = Op(Par2Index("c", i, j), '*', Var2Index("x", i, j));
 
-	EXPR sumObj1 = SumTo(SumIn(j, S, body_obj));
+	EXPR sumObj1 = SumTo(j, Num(0), Par("N"), body_obj); //SumTo(SumIn(j, S, body_obj));
 	EXPR sumObj2 = SumTo(SumIn(i, S, sumObj1, "objfunc1"));
 	cout << "name: " << sumObj2.exprName << endl;
 
