@@ -283,6 +283,13 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		r.now = name;
+		return r;
+	}
+
 	virtual Expr& clone() const
 	{
 		return cloneVar();
@@ -337,6 +344,18 @@ public:
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "}";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		GenMIP ri1 = i1.toMIP();
+		stringstream ss;
+		r.before = ri1.before;
+		ss << name << "[" << ri1.now << "]";
+		r.now = ss.str();
+		r.after = ri1.after;
+		return r;
 	}
 
 	virtual Var& cloneVar() const
@@ -636,6 +655,13 @@ public:
 		return ss.str();
 	}
 
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		r.now = name;
+		return r;
+	}
+
 	virtual Expr& clone() const
 	{
 		return *new Par(name, type);
@@ -685,6 +711,18 @@ public:
 		stringstream ss;
 		ss << name << "_{" << i1.toLatex() << "}";
 		return ss.str();
+	}
+
+	virtual GenMIP toMIP() const
+	{
+		GenMIP r;
+		GenMIP ri1 = i1.toMIP();
+		stringstream ss;
+		r.before = ri1.before;
+		ss << name << "[" << ri1.now << "]";
+		r.now = ss.str();
+		r.after = ri1.after;
+		return r;
 	}
 
 	virtual Expr& clone() const
@@ -1737,11 +1775,22 @@ public:
 
 		GenMIP retRhs = rhs.toMIP();
 		ss << retRhs.before;
+		if(retRhs.now == "")
+		{
+			cout << "MIPCons::toMIP:ERROR! empty rhs.now = '" << rhs.toString() << "'" << endl;
+			exit(1);
+		}
+
 		ss << "MIPCons " << name << "('" << signal << "', " << retRhs.now << ");\n";
 		ss << retRhs.after;
 
 		GenMIP retLhs = lhs.toMIP();
 		ss << retLhs.before;
+		if(retLhs.now == "")
+		{
+			cout << "MIPCons::toMIP:ERROR! empty lhs.now = '" << lhs.toString() << "'" << endl;
+			exit(1);
+		}
 		ss << name << " = " << retLhs.now << ";\n";
 		ss << retLhs.after;
 
@@ -1971,7 +2020,7 @@ public:
 		ss << ");\n\n";
 
 		for(unsigned i=0; i<constraints.size(); i++)
-			ss << constraints[i]->toMIP() << endl;
+			ss << constraints[i]->toMIP();
 
 		return ss.str();
 	}
