@@ -93,27 +93,56 @@ Modeler& tsp()
 	
 	INDEX i = Index("i", Integer);
 	INDEX j = Index("j", Integer);
-	SET S = Set("S");
+	INDEX k = Index("k", Integer);
+	INDEX r = Index("r", Integer);
+	INDEX s = Index("s", Integer);
+	INDEX t = Index("t", Integer);
 
-	EXPR body_obj = Op(Par2Index("c", i, j), '*', Var2Index("x", i, j));
+	PAR appFix = Par("appFix");
 
-	EXPR sumObj1 = SumTo(j, Num(0), Par("N"), body_obj); //SumTo(SumIn(j, S, body_obj));
-	EXPR sumObj2 = SumTo(SumIn(i, S, sumObj1, "objfunc1"));
-	cout << "name: " << sumObj2.exprName << endl;
+	SET S = Set("S"); // REMOVE!
 
-	mk.setObj(sumObj2);
+	SETSET R = SetSet("R");
+	SET T  = Set("T"); // 0..|T|
+	SETSET I = SetSet("I");
+	SETSET Il = SetSet("I^l");
+	SETSET Ix = SetSet("I^x");
+	SET Ir = SetSetElem(I, r);
+	SET Ils = SetSetElem(Il, s); 
+	SET Ixs = SetSetElem(Ix, s); 
+	EXPR Jsi = Par2Index("J", s, i);
+	EXPR Ksij = Par3Index("K", s, i, j);
+	SET Krij = Set("Krij");
+	SET RM = Set("RM");
 
-	//cout << sumObj.toLatex() << endl;
+	EXPR tm1 = Op(t, '-', Num(1));
+	EXPR deltasr = Par2Index("delta", s, r);
+	EXPR tmdelta = Op(t, '-', deltasr);
 
-	// --------------
+	SET RrRM = SetOp(SetSetElem(R, r), "U", RM); 
 
-	FORALL faC1 = ForAllTo(ForAllIn(i, S));
-	EXPR bodyC1 = Var2Index("x", Num(0), i);
+	// constraints 1
 
-	CONS c1 = Cons("c1", faC1, bodyC1, '<', Num(1));
+	EXPR Vrt = Var2Index("V", r, t);
+	EXPR Vrtm1 = Var2Index("V", r, tm1);
 
+	EXPR sum_1 = SumTo(k, Num(0), Ksij, Var5Index("x", s, i, t, j, k));
 
-	mk.addCons(c1);
+	EXPR body1 = Op(Op(Vrtm1, '-', Vrt), '+', SumIn(s, RrRM, SumIn(i, Ixs, SumTo(j, Num(0), Jsi, sum_1) ) ));
+	EXPR body2 = Op(body1, '+', SumIn(s, RrRM, SumIn(i, Ils, Var3Index("l", s, i , t )) ) );
+
+	FORALL fa_r = ForAllIn(r, RM);
+	//FORALL fa_rt = ForAllTo(ForAllIn(r, T, fa_r));
+
+	CONS c2 = Cons("c1", fa_r, body2, '=', appFix);
+
+	cout << c2.toLatex(false) << endl;
+	
+	EXPR obj = SumIn(i, T, Num(1), "obj");
+	mk.setObj(obj);
+
+	
+	mk.addCons(c2);
 
 	return mk.clone();
 }

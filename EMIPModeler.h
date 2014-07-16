@@ -653,7 +653,7 @@ public:
 	virtual string toLatex(bool br = true) const
 	{
 		stringstream ss;
-		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << i5.toLatex() << "}";
+		ss << name << "_{" << i1.toLatex() << "," << i2.toLatex() << "," << i3.toLatex() << "," << i4.toLatex() << ", " << i5.toLatex() << "}";
 		return ss.str();
 	}
 
@@ -2558,6 +2558,7 @@ typedef const Var& VAR;
 typedef const Par& PAR;
 typedef const Boolean& BOOLEAN;
 typedef const Set& SET;
+typedef const SetSet& SETSET;
 typedef const ForAll& FORALL;
 typedef const Cons& CONS;
 typedef const IfElse& IFELSE;
