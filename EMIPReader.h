@@ -42,10 +42,12 @@ public:
     Modeler& readFile(string filename)
     {
         bool minimize = true;
+        string text = removeComments(filename, minimize);
 
 
         Modeler mk = (minimize?Modeler(Minimize):Modeler(Maximize));
 
+        cout << "text:\n" << text << endl;
 
 
         return mk.clone();
