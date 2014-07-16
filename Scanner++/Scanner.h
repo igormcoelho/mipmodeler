@@ -36,7 +36,7 @@ using namespace std;
 
 #include "File.h"
 
-namespace lscodegen
+namespace scannerpp
 {
 
 class Scanner

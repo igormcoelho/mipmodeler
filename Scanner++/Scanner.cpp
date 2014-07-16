@@ -20,7 +20,7 @@
 
 #include "Scanner.h"
 
-using namespace lscodegen;
+using namespace scannerpp;
 
 Scanner::Scanner(File* inputfile)
 {

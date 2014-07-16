@@ -40,7 +40,7 @@ int main()
 
     for(unsigned i=0; i<10; i++)
     {
-	x[i]=MIPVar(MIPInteger, 0, MIPInf); 
+        x[i]=MIPVar(MIPInteger, 0, MIPInf);
     }
     x.print();
     x.renameVars();

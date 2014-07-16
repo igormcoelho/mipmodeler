@@ -1,0 +1,17 @@
+
+
+set I; # items
+
+param p {i in I};
+param w {i in I};
+
+param W;
+
+var x {i in I};
+
+maximize: sum{i in I} p[i]*x[i];
+
+subject to capacity: sum{i in I} w[i]*x[i] <= W;
+
+binary x; # (?) comments...
+

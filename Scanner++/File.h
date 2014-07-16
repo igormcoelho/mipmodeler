@@ -27,7 +27,7 @@
 using namespace std;
 #include<iostream>
 
-namespace lscodegen
+namespace scannerpp
 {
 
 class FileNotFound
