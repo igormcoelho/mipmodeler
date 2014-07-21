@@ -153,11 +153,10 @@ Modeler& tsp()
 int main()
 {
 
-    Reader r;
-    Modeler& mkread = r.readFile("test.mathprog");
-
-    mkread.print();
-    return 1;
+//    Reader r;
+//    Modeler& mkread = r.readFile("test.mathprog");
+//    mkread.print();
+//    return 1;
 
 
     Modeler& mk = tsp();

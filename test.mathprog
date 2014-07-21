@@ -1,17 +1,27 @@
 
+# excelent page: http://www3.nd.edu/~jeff/mathprog/mathprog.html
 
 set I; # items
 
-param p {i in I};
-param w {i in I};
+param p {i in I} > 0;
+param w {i in I} > 0;
 
-param W;
+param W > 0;
 
-var x {i in I};
+#var x {I} >= 0; 
+var x{I} binary;
+#var x{I} >= 0, integer;
 
-maximize: sum{i in I} p[i]*x[i];
+maximize fo: sum{i in I} p[i]*x[i];
 
-subject to capacity: sum{i in I} w[i]*x[i] <= W;
+subject to capacity: sum {i in I} w[i]*x[i] <= W;
 
 binary x; # (?) comments...
+
+data;
+
+#ignore after here
+
+#or generate reading code with Scanner...
+
 

@@ -6,4 +6,3 @@ emipmodel
 .cproject
 model.c
 smain.cpp
-*.orig
