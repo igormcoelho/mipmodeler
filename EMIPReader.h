@@ -16,6 +16,8 @@ public:
 
     string removeComments(string filename, bool& minimize)
     {
+        minimize = false;
+
         stringstream ss;
         Scanner s(new File(filename));
 
@@ -30,8 +32,8 @@ public:
                     break;
                 else
                     ss << word << " ";
-                if(word == "maximize:")
-                    minimize = false;
+                if(word == "minimize")
+                    minimize = true;
             }
             ss << endl;
         }
