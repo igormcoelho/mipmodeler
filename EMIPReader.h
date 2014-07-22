@@ -10,31 +10,92 @@ using namespace scannerpp;
 namespace EMIP
 {
 
+struct evar
+{
+    string name;
+    int nindex;
+    double lb;
+    double ub;
+    Type type;
+};
+
+struct epar
+{
+    string name;
+    int nindex;
+};
+
+struct eset
+{
+    string name;
+    int nindex;
+};
+
 class Reader
 {
 public:
 
+    vector<evar*> vvar;
+    vector<epar*> vpar;
+    vector<eset*> vset;
+
+    evar* getVar(string name)
+    {
+        for(unsigned i=0; i<vvar.size(); i++)
+            if(vvar[i]->name == name)
+                return vvar[i];
+        return NULL;
+    }
+
+    epar* getParam(string name)
+    {
+        for(unsigned i=0; i<vpar.size(); i++)
+            if(vpar[i]->name == name)
+                return vpar[i];
+        return NULL;
+    }
+
+    eset* getSet(string name)
+    {
+        for(unsigned i=0; i<vset.size(); i++)
+            if(vset[i]->name == name)
+                return vset[i];
+        return NULL;
+    }
+
     string removeComments(string text)
     {
-        stringstream ss;
+        string out;
+        bool inComment = false;
         Scanner s(text);
-
         while(s.hasNext())
         {
-            string line = s.nextLine();
-            Scanner sLine(line);
-            while(sLine.hasNext())
+            char c = s.nextChar();
+            if(!inComment && c=='#')
             {
-                string word = sLine.next();
-                if(word[0] == '#')
-                    break;
-                else
-                    ss << word << " ";
+                s.nextLine();
+                continue;
             }
-            ss << endl;
+
+            if(!inComment && (c=='/') && s.nextCharIs('*'))
+            {
+                s.nextChar();
+                inComment = true;
+                continue;
+            }
+
+            if(inComment && (c=='*') && s.nextCharIs('/'))
+            {
+                s.nextChar();
+                inComment = false;
+                continue;
+            }
+
+            if(!inComment)
+                out += c;
         }
 
-        return ss.str();
+        return out;
     }
 
     string cleanEmptyLines(string text)
