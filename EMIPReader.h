@@ -14,10 +14,8 @@ class Reader
 {
 public:
 
-    string removeComments(string text, bool& minimize)
+    string removeComments(string text)
     {
-        minimize = false;
-
         stringstream ss;
         Scanner s(text);
 
@@ -32,8 +30,6 @@ public:
                     break;
                 else
                     ss << word << " ";
-                if(word == "minimize")
-                    minimize = true;
             }
             ss << endl;
         }
@@ -54,15 +50,19 @@ public:
         return ss.str();
     }
 
-    pair<string, string> separateModelData(string content)
+    pair<string, string> separateModelData(string content, bool& minimize)
     {
+        minimize = false;
         Scanner scan(content);
         stringstream ss1;
         while(scan.hasNext())
         {
             string line = Scanner::trim(scan.nextLine());
             Scanner s(line);
-            if(s.next() != "data")
+            string word = s.next();
+            if(word == "minimize")
+                minimize = true;
+            if(word != "data")
                 ss1 << line << endl;
             else
                 break;
@@ -150,14 +150,14 @@ public:
 
     Modeler& readFile(string filename)
     {
-        bool minimize = true;
         Scanner scanAll(new File(filename));
-        string text1 = removeComments(scanAll.rest(), minimize);
+        string text1 = removeComments(scanAll.rest());
         string text = addSpaces(cleanEmptyLines(text1));
+        bool minimize = true;
+        pair<string, string> pmd = separateModelData(text, minimize);
 
         Modeler mk = (minimize?Modeler(Minimize):Modeler(Maximize));
 
-        pair<string, string> pmd = separateModelData(text);
         cout << "MODEL" << endl << pmd.first;
         cout << "DATA"  << endl << pmd.second;
 

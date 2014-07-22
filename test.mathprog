@@ -4,8 +4,8 @@
 
 set I; # items
 
-param p {i in I}; #do not use > 0
-param w {i in I};
+param p {I}; #do not use '> 0' or iterative expressions 'i in I'
+param w {I};
 
 
 
