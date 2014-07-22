@@ -17,18 +17,51 @@ struct evar
     double lb;
     double ub;
     Type type;
+
+    evar(string _name, int _nindex, double _lb, double _ub, Type _type) :
+        name(_name), nindex(_nindex), lb(_lb), ub(_ub), type(_type)
+    {
+        print();
+    }
+
+    void print()
+    {
+        cout << "evar('" << name << "', dim=" << nindex << ")" << endl;
+    }
 };
 
 struct epar
 {
     string name;
     int nindex;
+
+    epar(string _name, int _nindex) :
+        name(_name), nindex(_nindex)
+    {
+        print();
+    }
+
+    void print()
+    {
+        cout << "epar('" << name << "', dim=" << nindex << ")" << endl;
+    }
 };
 
 struct eset
 {
     string name;
     int nindex;
+
+    eset(string _name, int _nindex) :
+        name(_name), nindex(_nindex)
+    {
+        print();
+    }
+
+    void print()
+    {
+        cout << "eset('" << name << "', dim=" << nindex << ")" << endl;
+    }
 };
 
 class Reader
@@ -39,27 +72,13 @@ public:
     vector<epar*> vpar;
     vector<eset*> vset;
 
-    evar* getVar(string name)
+    // function get works for vvar, vpar and vset
+    template<class T>
+    T* get(string name, vector<T*>& vt)
     {
-        for(unsigned i=0; i<vvar.size(); i++)
-            if(vvar[i]->name == name)
-                return vvar[i];
-        return NULL;
-    }
-
-    epar* getParam(string name)
-    {
-        for(unsigned i=0; i<vpar.size(); i++)
-            if(vpar[i]->name == name)
-                return vpar[i];
-        return NULL;
-    }
-
-    eset* getSet(string name)
-    {
-        for(unsigned i=0; i<vset.size(); i++)
-            if(vset[i]->name == name)
-                return vset[i];
+        for(unsigned i=0; i<vt.size(); i++)
+            if(vt[i]->name == name)
+                return vt[i];
         return NULL;
     }
 
@@ -226,6 +245,63 @@ public:
         return output;
     }
 
+    vector<string> readListNoHead(Scanner& s)
+    {
+        vector<string> r;
+        s.useSeparators(", \t");
+        string elem = s.next();
+        while(elem != "}")
+        {
+            r.push_back(elem);
+            elem = s.next();
+        }
+        s.useDefaultSeparators();
+        return r;
+    }
+
+
+    string findSetVarParam(string text)
+    {
+        stringstream ss;
+        Scanner s(text);
+        while(s.hasNext())
+        {
+            string token = s.next();
+            if(token == "set")
+            {
+                string name = s.next();
+                string block = s.next();
+                if(block != ";")
+                {
+                    cout << "ERROR: NOT SUPPORTING SPECIFICATION OVER SETS (dimen, etc)!" << endl;
+                    exit(1);
+                }
+                vset.push_back(new eset(name, 1));
+            }
+            else if(token == "var")
+            {
+
+
+            }
+            else if(token == "param")
+            {
+                string name = s.next();
+                string block = s.next();
+                vector<string> vs;
+                if(block != ";")
+                {
+                    vs = readListNoHead(s);
+                    block = s.next();
+                }
+
+                vpar.push_back(new epar(name, vs.size()));
+            }
+            else
+                ss << token << " " << s.nextLine() << endl;
+        }
+
+        return ss.str();
+    }
 
     Modeler& readFile(string filename)
     {
@@ -241,6 +317,11 @@ public:
         cout << "MODEL" << endl << pmd.first;
         cout << "DATA"  << endl << pmd.second;
 
+        cout << "WILL READ MODEL PART" << endl;
+
+        string ctrs = findSetVarParam(pmd.first);
+
+        cout << "REST" << endl << ctrs;
 
         return mk.clone();
     }

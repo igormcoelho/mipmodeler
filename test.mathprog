@@ -5,12 +5,12 @@
 #   excelent pages: http://www3.nd.edu/~jeff/mathprog/mathprog.html
 #   https://www3.nd.edu/~jeff/mathprog/glpk-4.47/doc/gmpl.pdf
 
+param W;# do not use > 0
+
 set I; # items
 
 param p {I}; #do not use '> 0' or iterative expressions 'i in I'
 param w {I};
-
-param W;# do not use > 0
 
 #var x {I} >= 0;  # real unbounded
 #var x{I} binary;
