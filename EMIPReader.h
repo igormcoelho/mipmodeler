@@ -276,7 +276,7 @@ public:
                     cout << "ERROR: NOT SUPPORTING SPECIFICATION OVER SETS (dimen, etc)!" << endl;
                     exit(1);
                 }
-                vset.push_back(new eset(name, 1));
+                vset.push_back(new eset(name, 0));
             }
             else if(token == "var")
             {
