@@ -115,6 +115,7 @@ public:
     pair<string, string> separateModelData(string content, bool& minimize)
     {
         minimize = false;
+        bool found = false;
         Scanner scan(content);
         stringstream ss1;
         while(scan.hasNext())
@@ -123,7 +124,17 @@ public:
             Scanner s(line);
             string word = s.next();
             if(word == "minimize")
+            {
                 minimize = true;
+                found = true;
+            }
+
+            if(word == "maximize")
+            {
+                minimize = false;
+                found = true;
+            }
+
             if(word != "data")
                 ss1 << line << endl;
             else
@@ -135,6 +146,12 @@ public:
         {
             string line = Scanner::trim(scan.nextLine());
             ss2 << line << endl;
+        }
+
+        if(!found)
+        {
+            cout << "ERROR: didn't find 'minimize' or 'maximize' in model part" << endl;
+            exit(1);
         }
 
         return make_pair(ss1.str(), ss2.str());
@@ -217,6 +234,7 @@ public:
         string text = joinSemicolon(addSpaces(text1));
         bool minimize = true;
         pair<string, string> pmd = separateModelData(text, minimize);
+        string model = pmd.first;
 
         Modeler mk = (minimize?Modeler(Minimize):Modeler(Maximize));
 
