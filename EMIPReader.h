@@ -98,15 +98,16 @@ public:
         return out;
     }
 
-    string cleanEmptyLines(string text)
+    string joinSemicolon(string text)
     {
         stringstream ss;
         Scanner s(text);
         while(s.hasNext())
         {
-            string line = Scanner::trim(s.nextLine());
-            if(line != "")
-                ss << line << endl;
+            string word = s.next();
+            ss << word << " ";
+            if(word == ";")
+                ss << endl;
         }
         return ss.str();
     }
@@ -213,7 +214,7 @@ public:
     {
         Scanner scanAll(new File(filename));
         string text1 = removeComments(scanAll.rest());
-        string text = addSpaces(cleanEmptyLines(text1));
+        string text = joinSemicolon(addSpaces(text1));
         bool minimize = true;
         pair<string, string> pmd = separateModelData(text, minimize);
 
