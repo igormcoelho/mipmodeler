@@ -13,20 +13,25 @@ namespace EMIP
 struct evar
 {
     string name;
-    int nindex;
+    vector<string> sets;
     double lb;
     double ub;
     Type type;
 
-    evar(string _name, int _nindex, double _lb, double _ub, Type _type) :
-        name(_name), nindex(_nindex), lb(_lb), ub(_ub), type(_type)
+    evar(string _name, vector<string> _sets) :
+        name(_name), sets(_sets), lb(-Inf), ub(Inf), type(Real)
+    {
+    }
+
+    evar(string _name, vector<string> _sets, double _lb, double _ub, Type _type) :
+        name(_name), sets(_sets), lb(_lb), ub(_ub), type(_type)
     {
         print();
     }
 
     void print()
     {
-        cout << "evar('" << name << "', dim=" << nindex << ")" << endl;
+        cout << "evar('" << name << "', dim=" << sets.size() << " >= " << lb << " <= " << ub << " type: " << (type==Integer?"Integer":"") << (type==Binary?"Binary":"") << (type==Real?"Real":"") << ")" << endl;
     }
 };
 
@@ -280,8 +285,43 @@ public:
             }
             else if(token == "var")
             {
+                string name = s.next();
+                string block = s.next();
 
+                vector<string> vs;
+                if(block == "{")
+                {
+                    vs = readListNoHead(s);
+                    block = s.next();
+                }
 
+                evar* v = new evar(name, vs);
+
+                while(block != ";")
+                {
+                    string symbol = block;
+                    if(block == ",")
+                        symbol = s.next();
+                    if(symbol == ">=")
+                        v->lb = s.nextDouble();
+                    else if(symbol == "<=")
+                        v->ub = s.nextDouble();
+                    else if(symbol == "integer")
+                        v->type = Integer;
+                    else if(symbol == "binary")
+                        v->type = Binary;
+                    else
+                    {
+                        cout << "UNKNOWN SYMBOL '" << symbol << "' FOR VARIABLE '" << name << "'" << endl;
+                        exit(1);
+                    }
+
+                    block = s.next();
+                }
+
+                v->print();
+
+                vvar.push_back(v);
             }
             else if(token == "param")
             {

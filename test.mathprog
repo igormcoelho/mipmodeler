@@ -16,6 +16,8 @@ param w {I};
 #var x{I} binary;
 var x{I} >=0,<=1,integer; # simulating binary
 
+var y >= 0;
+
 maximize fo: sum{i in I} p[i]*x[i];
 
 subject to capacity:
