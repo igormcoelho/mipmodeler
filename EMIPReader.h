@@ -3,7 +3,7 @@
 
 #include "Scanner++/Scanner.h"
 
-#include "EMIPModeler.h"
+#include "EMIPModeler.hpp"
 
 using namespace scannerpp;
 

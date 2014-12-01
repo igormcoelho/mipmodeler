@@ -8,12 +8,12 @@
 
 #include<iostream>
 
-#include "EMIPModeler.h"
+#include "EMIPModeler.hpp"
 
 #include "MIPModel.h"
 #include "MIPVarArray.h"
 
-#include "EMIPReader.h"
+//#include "EMIPReader.h"
 
 using namespace std;
 using namespace EMIP;
