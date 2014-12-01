@@ -30,7 +30,7 @@ class Expr
 private:
 	Expr* mimic;
 
-public:
+protected:
 	string exprName; // do not set manually (use get)
 
 protected:

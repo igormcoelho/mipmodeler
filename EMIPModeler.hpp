@@ -35,8 +35,77 @@ using namespace std;
 namespace EMIP
 {
 
+class GeneralInfo
+{
+public:
+	vector<Index*> vindex;
+	vector<Set*> vset;
+	vector<Var*> vvar;
+	vector<Par*> vpar;
+
+public:
+	void declare(const Index& i)
+	{
+		vindex.push_back(&i.cloneIndex());
+	}
+	void declare(const Set& s)
+	{
+		vset.push_back(&s.clone());
+	}
+	void declare(const Var& v)
+	{
+		vvar.push_back(&v.cloneVar());
+	}
+	void declare(const Par& p)
+	{
+		vpar.push_back(&p.clonePar());
+	}
+
+	string toLatex() const
+	{
+		stringstream ss;
+		if (vindex.size() > 0)
+		{
+			ss << "Index: ";
+			for (unsigned i = 0; i < vindex.size(); i++)
+				ss << vindex[i]->name << " ";
+			ss << endl << endl;
+		}
+
+		if (vset.size() > 0)
+		{
+			ss << "Sets: ";
+			for (unsigned i = 0; i < vset.size(); i++)
+				ss << vset[i]->getName() << " ";
+			ss << endl << endl;
+		}
+
+		if (vvar.size() > 0)
+		{
+			ss << "Vars: ";
+			for (unsigned i = 0; i < vvar.size(); i++)
+				ss << vvar[i]->getExprName() << " ";
+			ss << endl << endl;
+		}
+
+		if (vpar.size() > 0)
+		{
+			ss << "Params: ";
+			for (unsigned i = 0; i < vpar.size(); i++)
+				ss << vpar[i]->getExprName() << " ";
+			ss << endl << endl;
+		}
+
+		return ss.str();
+	}
+
+};
+
 class Modeler
 {
+public:
+	GeneralInfo gi;
+
 protected:
 	ProblemType type;
 	Expr* obj;
@@ -65,6 +134,7 @@ public:
 			dependVar.push_back(&model.dependVar[i]->cloneVar());
 		for (unsigned i = 0; i < model.dependSet.size(); ++i)
 			dependSet.push_back(&model.dependSet[i]->clone());
+		gi = model.gi;
 	}
 
 	Modeler(ProblemType _type) :
@@ -151,6 +221,9 @@ public:
 			return "";
 
 		stringstream ss;
+
+		ss << gi.toLatex() << endl;
+
 		ss << "\\begin{equation}\n";
 
 		if (type == Minimize)
@@ -257,7 +330,6 @@ typedef const ForAll& FORALL;
 typedef const Cons& CONS;
 typedef const IfElse& IFELSE;
 typedef const Modeler& MODELER;
-
 
 }
 

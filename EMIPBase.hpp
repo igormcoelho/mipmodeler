@@ -50,5 +50,4 @@ struct GenMIP
 
 }
 
-
 #endif /* EMIPBASE_HPP_ */

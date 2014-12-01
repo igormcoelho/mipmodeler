@@ -66,7 +66,7 @@ public:
 			ss << "\\left(";
 		ss << e1.toLatex() << " ";
 		if (op == '*')
-			ss << "\\times";
+			ss << "\\cdot";
 		else
 			ss << op;
 
