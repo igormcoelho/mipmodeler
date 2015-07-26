@@ -9,35 +9,100 @@
 #include<stdio.h>
 #include<iostream>
 
+#include "mimic.h"
+
 using namespace std;
+
+// RULES FOR MIMIC PATTERN
+// 1-No public variables
+// 2-All methods must follow the mimic pattern, otherwise undefined behavior will occur
+// 3-Copy constructor cannot be used anymore (mimic will use it)
+// 4-Class X must provide a virtual void clone(X*&) const method.
+
+#define MIMIC_INIT(CLASS)     _mimic_##CLASS = NULL;
+#define MIMIC_DESTROY(CLASS)  if(_mimic_##CLASS)\
+                                   delete _mimic_##CLASS;
+#define MIMIC_COPY(CLASS)     public:\
+                              CLASS(const CLASS& a)\
+                              {\
+                                  if (a._mimic_##CLASS)\
+                                       a._mimic_##CLASS->clone(_mimic_##CLASS);\
+                                  else\
+                                       a.clone(_mimic_##CLASS);\
+                              }
+#define MIMIC_ASSIGN(CLASS)   public:\
+                              CLASS& operator=(const CLASS& m)\
+                              {\
+                                  if (&m == this)\
+                                      return *this;\
+                                  if (_mimic_##CLASS)\
+                                  {\
+                                      delete _mimic_##CLASS;\
+                                      _mimic_##CLASS = NULL;\
+                                  }\
+                                  if (m._mimic_##CLASS)\
+                                      m._mimic_##CLASS->clone(_mimic_##CLASS);\
+                                  else\
+                                      m.clone(_mimic_##CLASS);\
+                                  return *this;\
+                              }
+#define MIMIC_VOIDFUNC(CLASS, f,...)      if(_mimic_##CLASS)\
+                                          {\
+                                              _mimic_##CLASS -> f ( __VA_ARGS__ );\
+                                              return;\
+                                          }
+#define MIMIC_RETFUNC(CLASS, f,...)       if(_mimic_##CLASS)\
+                                              return _mimic_##CLASS -> f ( __VA_ARGS__ );
+
+#define MIMIC_CLONE(CLASS, BASE)           virtual void clone(BASE*& m) const\
+                                           {\
+                                               CLASS* a;\
+                                               clone(a);\
+                                               m = a;\
+                                           }
+
+#define MIMIC_BEGIN(CLASS)     private: \
+                                   CLASS* _mimic_##CLASS;\
+                               MIMIC_COPY(CLASS)\
+                               MIMIC_ASSIGN(CLASS)\
+                               private:
+
+#define DISABLE_SLICING(CLASS)             private:\
+                                           template<typename T> CLASS(T const& d);\
+                                           template<typename T> CLASS const& operator=(T const& rhs);
+
 
 class Mimic
 {
-private:
-    Mimic* mimic;
+    MIMIC_BEGIN(Mimic)
+//private:
+//    Mimic* mimic;
 
 protected:
     Mimic()
     {
+        MIMIC_INIT(Mimic)
         //cout << __PRETTY_FUNCTION__ << endl;
-        mimic = NULL;
+        //mimic = NULL;
     }
 
 public:
 
     virtual ~Mimic()
     {
-        if (mimic)
-            delete mimic;
+        MIMIC_DESTROY(Mimic)
+        //if (mimic)
+        //    delete mimic;
     }
 
-    Mimic(const Mimic& b)
-    {
-        if (b.mimic)
-            b.mimic->clone(mimic);
-        else
-            b.clone(mimic);
-    }
+    //MIMIC_COPY(Mimic)
+//    Mimic(const Mimic& b)
+//    {
+//        if (b.mimic)
+//            b.mimic->clone(mimic);
+//        else
+//            b.clone(mimic);
+//    }
 
     virtual void clone(Mimic*& m) const
     {
@@ -46,25 +111,38 @@ public:
 
     virtual void work() const
     {
-        assert(mimic);
-        mimic->work();
+        MIMIC_VOIDFUNC(Mimic, work)
+        //assert(mimic);
+        //mimic->work();
     }
 
-    Mimic& operator=(const Mimic& m)
+    virtual void work2(int x, int y) const
     {
-        if (&m == this)
-            return *this;
-        if (mimic)
-        {
-            delete mimic;
-            mimic = NULL;
-        }
-        if (m.mimic)
-            m.mimic->clone(mimic);
-        else
-            m.clone(mimic);
-        return *this;
+        MIMIC_VOIDFUNC(Mimic, work2, x, y)
+
+        cout << "x=" << x << endl;
+        //assert(mimic);
+        //mimic->work();
     }
+
+    //MIMIC_ASSIGN(Mimic)
+    /*
+     Mimic& operator=(const Mimic& m)
+     {
+     if (&m == this)
+     return *this;
+     if (mimic)
+     {
+     delete mimic;
+     mimic = NULL;
+     }
+     if (m.mimic)
+     m.mimic->clone(mimic);
+     else
+     m.clone(mimic);
+     return *this;
+     }
+     */
 };
 
 // Base class should include mimic variable
@@ -563,6 +641,8 @@ public:
 
     virtual void work() const
     {
+        //MIMIC_VOIDFUNC(A, work)
+
         if (mimic2)
         {
             mimic2->work();
@@ -574,7 +654,9 @@ public:
 
     virtual void clone(Mimic*& m) const
     {
-        m = new A();
+        A* a;
+        clone(a);
+        m = a;
     }
 
     virtual void clone(A*& a) const
@@ -630,6 +712,11 @@ public:
         a = new B();
     }
 
+    virtual void clone(B*& b) const
+    {
+        b = new B();
+    }
+
     virtual B& operator=(const B& m)
     {
         if (&m == this)
@@ -641,13 +728,7 @@ public:
 
 class C: public B
 {
-
-private:
-    // USE THIS TO DISABLE FUTURE SLICINGS WITHOUT THE MIMIC
-    // To force a compile error for non-friends (thanks bk1e)
-    // Not implemented, so will cause a link error for friends
-    template<typename T> C(T const& d);
-    template<typename T> C const& operator=(T const& rhs);
+    DISABLE_SLICING(C)
 
 public:
 
@@ -671,7 +752,6 @@ public:
     }
 
 };
-
 
 class D: public C
 {
@@ -698,8 +778,6 @@ public:
 
 };
 
-
-
 void print(A& a)
 {
     cout << "print A: ";
@@ -718,7 +796,6 @@ void print(C& c)
     c.work();
 }
 
-
 int main()
 {
     cout << "BEGIN TESTS" << endl;
@@ -733,7 +810,6 @@ int main()
     print(*abp);
 
     cout << endl << endl;
-
 
     B b;
     b.work();
