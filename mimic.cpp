@@ -25,11 +25,12 @@ using namespace std;
 #define MIMIC_COPY(CLASS)     public:\
                               CLASS(const CLASS& a)\
                               {\
+                                  _mimic_##CLASS = NULL;\
                                   if (a._mimic_##CLASS)\
                                        a._mimic_##CLASS->clone(_mimic_##CLASS);\
                                   else\
                                        a.clone(_mimic_##CLASS);\
-                              }
+                              };
 #define MIMIC_ASSIGN(CLASS)   public:\
                               CLASS& operator=(const CLASS& m)\
                               {\
@@ -45,7 +46,7 @@ using namespace std;
                                   else\
                                       m.clone(_mimic_##CLASS);\
                                   return *this;\
-                              }
+                              };
 #define MIMIC_VOIDFUNC(CLASS, f,...)      if(_mimic_##CLASS)\
                                           {\
                                               _mimic_##CLASS -> f ( __VA_ARGS__ );\
@@ -56,7 +57,7 @@ using namespace std;
 
 #define MIMIC_CLONE(CLASS, BASE)           virtual void clone(BASE*& m) const\
                                            {\
-                                               CLASS* a;\
+                                               CLASS* a = NULL;\
                                                clone(a);\
                                                m = a;\
                                            }
@@ -65,142 +66,11 @@ using namespace std;
                                    CLASS* _mimic_##CLASS;\
                                MIMIC_COPY(CLASS)\
                                MIMIC_ASSIGN(CLASS)\
-                               private:
-
+                               private: \
+ 
 #define DISABLE_SLICING(CLASS)             private:\
                                            template<typename T> CLASS(T const& d);\
                                            template<typename T> CLASS const& operator=(T const& rhs);
-
-
-class Mimic
-{
-    MIMIC_BEGIN(Mimic)
-//private:
-//    Mimic* mimic;
-
-protected:
-    Mimic()
-    {
-        MIMIC_INIT(Mimic)
-        //cout << __PRETTY_FUNCTION__ << endl;
-        //mimic = NULL;
-    }
-
-public:
-
-    virtual ~Mimic()
-    {
-        MIMIC_DESTROY(Mimic)
-        //if (mimic)
-        //    delete mimic;
-    }
-
-    //MIMIC_COPY(Mimic)
-//    Mimic(const Mimic& b)
-//    {
-//        if (b.mimic)
-//            b.mimic->clone(mimic);
-//        else
-//            b.clone(mimic);
-//    }
-
-    virtual void clone(Mimic*& m) const
-    {
-        m = new Mimic(*this);
-    }
-
-    virtual void work() const
-    {
-        MIMIC_VOIDFUNC(Mimic, work)
-        //assert(mimic);
-        //mimic->work();
-    }
-
-    virtual void work2(int x, int y) const
-    {
-        MIMIC_VOIDFUNC(Mimic, work2, x, y)
-
-        cout << "x=" << x << endl;
-        //assert(mimic);
-        //mimic->work();
-    }
-
-    //MIMIC_ASSIGN(Mimic)
-    /*
-     Mimic& operator=(const Mimic& m)
-     {
-     if (&m == this)
-     return *this;
-     if (mimic)
-     {
-     delete mimic;
-     mimic = NULL;
-     }
-     if (m.mimic)
-     m.mimic->clone(mimic);
-     else
-     m.clone(mimic);
-     return *this;
-     }
-     */
-};
-
-// Base class should include mimic variable
-// designed for originally pure abstract classes
-class MimicBase
-{
-private:
-    MimicBase* mimic;
-
-protected:
-    MimicBase()
-    {
-        mimic = NULL;
-    }
-
-public:
-
-    virtual ~MimicBase()
-    {
-        if (mimic)
-            delete mimic;
-    }
-
-    MimicBase(const MimicBase& b)
-    {
-        if (b.mimic)
-            mimic = &b.mimic->clone();
-        else
-            mimic = &b.clone();
-    }
-
-    virtual MimicBase& clone() const
-    {
-        return *new MimicBase(*this);
-    }
-
-    inline virtual void work() const
-    {
-        assert(mimic);
-        mimic->work();
-    }
-
-    MimicBase& operator=(const MimicBase& m)
-    {
-        if (&m == this)
-            return *this;
-        if (mimic)
-        {
-            delete mimic;
-            mimic = NULL;
-        }
-        if (m.mimic)
-            mimic = &m.mimic->clone();
-        else
-            mimic = &m.clone();
-        return *this;
-    }
-};
 
 class Move
 {
@@ -418,81 +288,6 @@ public:
     }
 };
 
-/*
- class Include
- {
- private:
-
-
- public:
- Include(Move& m)
- : base(m), mimic(MoveSwap(9,8))
- {
- }
-
- Include()
- : mimic(MoveSwap(3,4)), base(NULL)
- {
- }
-
- void callWork()
- {
- cout << "call work" << endl;
- mimic.work();
- }
-
- private:
- MoveSwap mimic;
- Move base;
- };
- */
-
-class NS
-{
-public:
-
-    NS()
-    {
-    }
-
-    virtual ~NS()
-    {
-    }
-
-    virtual Move generate() = 0;
-};
-
-class NSSwap: public NS
-{
-public:
-
-    Move generate()
-    {
-        MoveSwap mv(0, 99);
-
-        cout << "will return (" << &mv << ")" << endl;
-        return mv;
-    }
-
-    MoveSwap generate2()
-    {
-        MoveSwap mv(2, 99);
-
-        cout << "will return (" << &mv << ")" << endl;
-        return mv;
-    }
-
-    Move generate3()
-    {
-        return MoveSwap(3, 99);
-    }
-
-    MoveSwap generate4()
-    {
-        return MoveSwap(4, 99);
-    }
-};
-
 void testmove()
 {
     cout << "DIRECT PRINT" << endl;
@@ -573,41 +368,6 @@ void testmove()
 
     // ==================================
 
-    cout << "NSSWAP" << endl;
-    NSSwap nsswap;
-    cout << "generate()" << endl;
-    Move mov = nsswap.generate();
-    cout << "got " << &mov << endl;
-    mov.work();
-
-    cout << endl;
-
-    cout << "generate2() no storage" << endl;
-    nsswap.generate2();
-
-    cout << endl;
-
-    cout << "generate2() storage" << endl;
-    MoveSwap mov2 = nsswap.generate2();
-    cout << "got " << &mov2 << endl;
-    mov2.work();
-
-    cout << endl;
-
-    cout << "generate3() storage" << endl;
-    Move mov3 = nsswap.generate3();
-    cout << "got " << &mov3 << endl;
-    mov3.work();
-
-    cout << endl;
-
-    cout << "generate4() storage" << endl;
-    MoveSwap mov4 = nsswap.generate4();
-    cout << "got " << &mov4 << endl;
-    mov4.work();
-
-    cout << endl;
-
     cout << "MULTIPLE COPY" << endl;
     Move m5 = Move(Move(Move(MoveSwap(MoveSwap(MoveSwap(5, 88))))));
     m5.work();
@@ -619,110 +379,122 @@ void testmove()
     //empty.work();
 }
 
+class Mimic
+{
+    MIMIC_BEGIN(Mimic)
+
+// pure abstract class!
+protected:
+    Mimic()
+    {
+        MIMIC_INIT(Mimic)
+    }
+
+public:
+
+    virtual ~Mimic()
+    {
+        MIMIC_DESTROY(Mimic)
+    }
+
+    virtual void clone(Mimic*& m) const
+    {
+        m = new Mimic(*this);
+    }
+
+    virtual void work() const
+    {
+        MIMIC_VOIDFUNC(Mimic, work)
+        cout << "work!!" << endl;
+    }
+
+    virtual int dfunc(int x, int y) const
+    {
+        MIMIC_RETFUNC(Mimic, dfunc, x, y)
+        return x + y;
+    }
+};
+
 class A: public Mimic
 {
-private:
-    A* mimic2;
+    MIMIC_BEGIN(A)
 
 public:
 
     A()
     {
-        mimic2 = NULL;
+        MIMIC_INIT(A)
     }
 
-    A(const A& a)
+    virtual ~A()
     {
-        if (a.mimic2)
-            a.mimic2->clone(mimic2);
-        else
-            a.clone(mimic2);
+        MIMIC_DESTROY(A)
     }
 
     virtual void work() const
     {
-        //MIMIC_VOIDFUNC(A, work)
+        MIMIC_VOIDFUNC(A, work)
 
-        if (mimic2)
-        {
-            mimic2->work();
-            return;
-        }
-
-        cout << "A()" << endl;
+        cout << "work:A()" << endl;
     }
 
-    virtual void clone(Mimic*& m) const
+    virtual int dfunc(int x, int y) const
     {
-        A* a;
-        clone(a);
-        m = a;
+        MIMIC_RETFUNC(A, dfunc, x, y)
+
+        return x * y;
     }
+
+    MIMIC_CLONE(A, Mimic)
 
     virtual void clone(A*& a) const
     {
+        cout << "CLONE(A)" << endl;
         a = new A();
-    }
-
-    virtual A& operator=(const A& m)
-    {
-        if (&m == this)
-            return *this;
-        if (mimic2)
-        {
-            delete mimic2;
-            mimic2 = NULL;
-        }
-        if (m.mimic2)
-            m.mimic2->clone(mimic2);
-        else
-            m.clone(mimic2);
-
-        return *this;
     }
 
 };
 
 class B: public A
 {
+    MIMIC_BEGIN(B)
 
 public:
 
     B()
     {
+        MIMIC_INIT(B)
     }
 
-    B(const B& b) :
-        A()
+    virtual ~B()
     {
+        MIMIC_DESTROY(B)
     }
 
     virtual void work() const
     {
-        cout << "B()" << endl;
+        MIMIC_VOIDFUNC(B, work)
+
+        cout << "work:B()" << endl;
     }
 
-    virtual void clone(Mimic*& m) const
-    {
-        m = new B();
-    }
+    MIMIC_CLONE(B, Mimic)
 
-    virtual void clone(A*& a) const
-    {
-        a = new B();
-    }
+    MIMIC_CLONE(B, A)
 
     virtual void clone(B*& b) const
     {
+        assert(b==NULL);
         b = new B();
     }
 
-    virtual B& operator=(const B& m)
-    {
-        if (&m == this)
-            return *this;
-        return *this;
-    }
+    /*
+     virtual B& operator=(const B& m)
+     {
+     if (&m == this)
+     return *this;
+     return *this;
+     }*/
 
 };
 
@@ -741,14 +513,26 @@ public:
     {
     }
 
-    virtual void work()
+    virtual void work() const
     {
-        cout << "C()" << endl;
+        cout << "work:C()" << endl;
     }
 
-    virtual void clone(Mimic* m)
+    MIMIC_CLONE(C, Mimic)
+
+    MIMIC_CLONE(C, A)
+
+    MIMIC_CLONE(C, B)
+
+    virtual void clone(C*& m) const
     {
         m = new C();
+    }
+
+    C& operator=(const C& c)
+    {
+        cout << "CCCC" << endl;
+        return *this;
     }
 
 };
@@ -766,7 +550,7 @@ public:
     {
     }
 
-    virtual void work()
+    virtual void work() const
     {
         cout << "D()" << endl;
     }
@@ -802,30 +586,28 @@ int main()
 
     //testmove();
 
-    A* ap = new A();
-    B* bp = new B();
-    A* abp = new B();
-    print(*ap);
-    print(*bp);
-    print(*abp);
+    /*
+     A* ap = new A();
+     B* bp = new B();
+     A* abp = new B();
+     print(*ap);
+     print(*bp);
+     print(*abp);
+     */
 
     cout << endl << endl;
 
     B b;
     b.work();
-    print(b);
 
     A a = b;
     a.work();
-    print(a);
 
     C c;
     c.work();
-    print(c);
 
     b = c;
     b.work();
-    print(b);
 
     cout << "FINISHED OK!" << endl;
     return 0;
