@@ -5,7 +5,6 @@
 // The MoveSwap Pattern makes a class imitate the behavior
 // of another class (usually an inherited one).
 
-
 #include<assert.h>
 #include<iostream>
 
@@ -32,13 +31,11 @@ public:
 //		mimic = p;
 //	}
 
-
-
     Move(const Move& b)
     {
         cout << __PRETTY_FUNCTION__ << endl;
         cout << "b.mimic=" << b.mimic << endl;
-        if(b.mimic)
+        if (b.mimic)
         {
             cout << "COPY pointer!!" << endl;
             mimic = &b.mimic->clone();
@@ -51,27 +48,27 @@ public:
     }
 
     /*
-    	Move(const Move&& r)
-    	{
-    		cout << __PRETTY_FUNCTION__ << endl;
-    		if(r.mimic)
-    		{
-    			cout << "STEAL pointer!!" << endl;
-    			Move& m = const_cast<Move&>(r);
-    			mimic = m.mimic;
-    			m.mimic = NULL;
-    		}
-    		else
-    		{
-    			cout << "COPY body!!" << endl;
-    			mimic = &r.clone();
-    		}
-    	}
-    */
+     Move(const Move&& r)
+     {
+     cout << __PRETTY_FUNCTION__ << endl;
+     if(r.mimic)
+     {
+     cout << "STEAL pointer!!" << endl;
+     Move& m = const_cast<Move&>(r);
+     mimic = m.mimic;
+     m.mimic = NULL;
+     }
+     else
+     {
+     cout << "COPY body!!" << endl;
+     mimic = &r.clone();
+     }
+     }
+     */
 
     virtual ~Move()
     {
-        if(mimic)
+        if (mimic)
             delete mimic;
     }
 
@@ -79,7 +76,7 @@ public:
     virtual Move& clone() const
     {
         cout << __PRETTY_FUNCTION__ << endl;
-        return * new Move(*this);
+        return *new Move(*this);
     }
 
     // method mimic() that generates an object that
@@ -99,41 +96,44 @@ public:
     Move& operator=(const Move& m)
     {
         cout << "Move::operator=" << endl;
-        if(&m == this)
+        if (&m == this)
             return *this;
-        cout << "(m.mimic=" << m.mimic << ")" << endl;
-        mimic = (m.mimic?&m.mimic->clone():NULL);
+        if (mimic)
+            delete mimic;
+        mimic = NULL;
+        cout << "(m.mimic=" << m.mimic << ") := ";
+        mimic = (m.mimic ? &m.mimic->clone() : &m.clone());
+        cout << mimic << endl;
 
         return *this;
     }
 };
 
-
-class MoveSwap : public Move
+class MoveSwap: public Move
 {
 protected:
     int i;
     int j;
 public:
-    MoveSwap(int _i, int _j)
-        : i(_i), j(_j)
+    MoveSwap(int _i, int _j) :
+        i(_i), j(_j)
     {
         cout << "MoveSwap(" << i << "," << j << ")" << endl;
     }
 
-    MoveSwap(const MoveSwap& b)
-        : i(b.i), j(b.j)
+    MoveSwap(const MoveSwap& b) :
+        i(b.i), j(b.j)
     {
         cout << __PRETTY_FUNCTION__ << endl;
     }
 
     /*
-    	MoveSwap(MoveSwap&& b)
-    		: i(b.i), j(b.j)
-    	{
-    		cout << __PRETTY_FUNCTION__ << endl;
-    	}
-    */
+     MoveSwap(MoveSwap&& b)
+     : i(b.i), j(b.j)
+     {
+     cout << __PRETTY_FUNCTION__ << endl;
+     }
+     */
 
     virtual ~MoveSwap()
     {
@@ -142,7 +142,7 @@ public:
     virtual Move& clone() const
     {
         cout << __PRETTY_FUNCTION__ << endl;
-        return * new MoveSwap(*this);
+        return *new MoveSwap(*this);
     }
 
     virtual Move doMimic() const
@@ -153,13 +153,13 @@ public:
     virtual void work() const
     {
         cout << __PRETTY_FUNCTION__ << endl;
-        cout << "WORK! (" << i << "," << j << ")" << endl;
+        cout << "MOVE_SWAP_WORK! (" << i << "," << j << ")" << endl;
     }
 
     virtual MoveSwap& operator=(const MoveSwap& m)
     {
         cout << __PRETTY_FUNCTION__ << endl;
-        if(&m == this)
+        if (&m == this)
             return *this;
         i = m.i;
         j = m.j;
@@ -167,35 +167,34 @@ public:
     }
 };
 
-
 /*
-class Include
-{
-private:
+ class Include
+ {
+ private:
 
 
-public:
-	Include(Move& m)
-		: base(m), mimic(MoveSwap(9,8))
-	{
-	}
+ public:
+ Include(Move& m)
+ : base(m), mimic(MoveSwap(9,8))
+ {
+ }
 
-	Include()
-		: mimic(MoveSwap(3,4)), base(NULL)
-	{
-	}
+ Include()
+ : mimic(MoveSwap(3,4)), base(NULL)
+ {
+ }
 
-	void callWork()
-	{
-		cout << "call work" << endl;
-		mimic.work();
-	}
+ void callWork()
+ {
+ cout << "call work" << endl;
+ mimic.work();
+ }
 
-private:
-	MoveSwap mimic;
-	Move base;
-};
-*/
+ private:
+ MoveSwap mimic;
+ Move base;
+ };
+ */
 
 class NS
 {
@@ -209,17 +208,16 @@ public:
     {
     }
 
-
     virtual Move generate() = 0;
 };
 
-class NSSwap : public NS
+class NSSwap: public NS
 {
 public:
 
     Move generate()
     {
-        MoveSwap mv(0,99);
+        MoveSwap mv(0, 99);
 
         cout << "will return (" << &mv << ")" << endl;
         return mv;
@@ -227,7 +225,7 @@ public:
 
     MoveSwap generate2()
     {
-        MoveSwap mv(2,99);
+        MoveSwap mv(2, 99);
 
         cout << "will return (" << &mv << ")" << endl;
         return mv;
@@ -235,12 +233,12 @@ public:
 
     Move generate3()
     {
-        return MoveSwap(3,99);
+        return MoveSwap(3, 99);
     }
 
     MoveSwap generate4()
     {
-        return MoveSwap(4,99);
+        return MoveSwap(4, 99);
     }
 };
 
@@ -248,29 +246,30 @@ int main()
 {
 
     cout << "DIRECT PRINT" << endl;
-    MoveSwap m(100,9);
-    cout << "work()" << endl;
+    MoveSwap m(100, 9);
+    cout << "*** try work()" << endl;
     m.work();
 
     cout << endl;
 
     cout << "DIRECT COPY" << endl;
     Move mcopy = m;
-    cout << "work()" << endl;
+    cout << "*** try work()" << endl;
     mcopy.work();
-
+    cout << "*** try work() m" << endl;
+    m.work();
     cout << endl;
 
     cout << "RESET COPY" << endl;
     mcopy = m;
-    cout << "work()" << endl;
+    cout << "*** try work()" << endl;
     mcopy.work();
 
     cout << endl;
 
     cout << "COPY THE COPY" << endl;
     Move mcopy2 = mcopy;
-    cout << "work()" << endl;
+    cout << "*** try work()" << endl;
     mcopy2.work();
 
     //cout << "INCLUDE CALL WORK" << endl;
@@ -315,7 +314,7 @@ int main()
     cout << endl;
 
     cout << "MULTIPLE COPY" << endl;
-    Move m5 = Move(Move(Move(MoveSwap(MoveSwap(MoveSwap(5,88))))));
+    Move m5 = Move(Move(Move(MoveSwap(MoveSwap(MoveSwap(5, 88))))));
     m5.work();
 
     cout << endl;
@@ -324,8 +323,8 @@ int main()
     //Move empty; // ERROR! protected constructor!
     //empty.work();
 
+    cout << "FINISHED OK!" << endl;
     return 0;
-};
-
-
+}
+;
 
