@@ -6,9 +6,123 @@
 // of another class (usually an inherited one).
 
 #include<assert.h>
+#include<stdio.h>
 #include<iostream>
 
 using namespace std;
+
+class Mimic
+{
+private:
+    Mimic* mimic;
+
+protected:
+    Mimic()
+    {
+        //cout << __PRETTY_FUNCTION__ << endl;
+        mimic = NULL;
+    }
+
+public:
+
+    virtual ~Mimic()
+    {
+        if (mimic)
+            delete mimic;
+    }
+
+    Mimic(const Mimic& b)
+    {
+        if (b.mimic)
+            b.mimic->clone(mimic);
+        else
+            b.clone(mimic);
+    }
+
+    virtual void clone(Mimic*& m) const
+    {
+        m = new Mimic(*this);
+    }
+
+    virtual void work() const
+    {
+        assert(mimic);
+        mimic->work();
+    }
+
+    Mimic& operator=(const Mimic& m)
+    {
+        if (&m == this)
+            return *this;
+        if (mimic)
+        {
+            delete mimic;
+            mimic = NULL;
+        }
+        if (m.mimic)
+            m.mimic->clone(mimic);
+        else
+            m.clone(mimic);
+        return *this;
+    }
+};
+
+// Base class should include mimic variable
+// designed for originally pure abstract classes
+class MimicBase
+{
+private:
+    MimicBase* mimic;
+
+protected:
+    MimicBase()
+    {
+        mimic = NULL;
+    }
+
+public:
+
+    virtual ~MimicBase()
+    {
+        if (mimic)
+            delete mimic;
+    }
+
+    MimicBase(const MimicBase& b)
+    {
+        if (b.mimic)
+            mimic = &b.mimic->clone();
+        else
+            mimic = &b.clone();
+    }
+
+    virtual MimicBase& clone() const
+    {
+        return *new MimicBase(*this);
+    }
+
+    inline virtual void work() const
+    {
+        assert(mimic);
+        mimic->work();
+    }
+
+    MimicBase& operator=(const MimicBase& m)
+    {
+        if (&m == this)
+            return *this;
+        if (mimic)
+        {
+            delete mimic;
+            mimic = NULL;
+        }
+        if (m.mimic)
+            mimic = &m.mimic->clone();
+        else
+            mimic = &m.clone();
+        return *this;
+    }
+};
 
 class Move
 {
@@ -86,7 +200,7 @@ public:
     {
     }
 
-    inline virtual void work() const
+    virtual void work() const
     {
         cout << __PRETTY_FUNCTION__ << endl;
         assert(mimic);
@@ -167,6 +281,65 @@ public:
     }
 };
 
+class Move2: public MoveSwap
+{
+protected:
+    int k;
+public:
+    Move2(int _i, int _j, int _k) :
+        k(_k), MoveSwap(_i, _j)
+    {
+        cout << "Move2(" << _i << "," << _j << "," << _k << ")" << endl;
+    }
+
+    Move2(const Move2& b) :
+        k(b.k), MoveSwap(b)
+    {
+        cout << __PRETTY_FUNCTION__ << endl;
+        cout << "Move2(" << b.i << "," << b.j << "," << b.k << ")" << endl;
+    }
+
+    /*
+     MoveSwap(MoveSwap&& b)
+     : i(b.i), j(b.j)
+     {
+     cout << __PRETTY_FUNCTION__ << endl;
+     }
+     */
+
+    virtual ~Move2()
+    {
+    }
+
+    virtual Move& clone() const
+    {
+        cout << __PRETTY_FUNCTION__ << endl;
+        return *new Move2(*this);
+    }
+
+    virtual Move doMimic() const
+    {
+        return Move(*this);
+    }
+
+    virtual void work() const
+    {
+        cout << __PRETTY_FUNCTION__ << endl;
+        cout << "MOVE2_WORK! (" << i << "," << j << "," << k << ")" << endl;
+    }
+
+    virtual MoveSwap& operator=(const Move2& m)
+    {
+        cout << __PRETTY_FUNCTION__ << endl;
+        if (&m == this)
+            return *this;
+
+        (MoveSwap&) (*this) = (MoveSwap&) m;
+        k = m.k;
+        return *this;
+    }
+};
+
 /*
  class Include
  {
@@ -242,9 +415,8 @@ public:
     }
 };
 
-int main()
+void testmove()
 {
-
     cout << "DIRECT PRINT" << endl;
     MoveSwap m(100, 9);
     cout << "*** try work()" << endl;
@@ -277,6 +449,51 @@ int main()
     //inc.callWork();
 
     cout << endl;
+
+    cout << endl << "========================================" << endl << endl;
+    // ===========================================
+
+    cout << "(2)DIRECT PRINT" << endl;
+    Move2 m2(100, 9, 10);
+    cout << "*** try work()" << endl;
+    m2.work();
+    cout << endl;
+
+    cout << "(2)DIRECT COPY" << endl;
+    Move mcopy2X = m2;
+    cout << "*** try work()" << endl;
+    mcopy2X.work();
+    cout << "*** try work() m" << endl;
+    m2.work();
+    cout << endl;
+
+    cout << "(2)RESET COPY" << endl;
+    mcopy2X = m2;
+    cout << "*** try work()" << endl;
+    mcopy2X.work();
+    cout << endl;
+
+    cout << "(2)RESET COPY Swap to Move2" << endl;
+    mcopy2X = m;
+    cout << "*** try work()" << endl;
+    mcopy2X.work();
+    cout << endl;
+
+    cout << endl << "========================================" << endl << endl;
+    // ====================================================
+
+    cout << "COPY THE COPY" << endl;
+    Move mcopyX = mcopy;
+    cout << "*** try work()" << endl;
+    mcopyX.work();
+
+    //cout << "INCLUDE CALL WORK" << endl;
+    //Include inc(m);
+    //inc.callWork();
+
+    cout << endl;
+
+    // ==================================
 
     cout << "NSSWAP" << endl;
     NSSwap nsswap;
@@ -322,9 +539,219 @@ int main()
     //cout << "EMPTY" << endl;
     //Move empty; // ERROR! protected constructor!
     //empty.work();
+}
+
+class A: public Mimic
+{
+private:
+    A* mimic2;
+
+public:
+
+    A()
+    {
+        mimic2 = NULL;
+    }
+
+    A(const A& a)
+    {
+        if (a.mimic2)
+            a.mimic2->clone(mimic2);
+        else
+            a.clone(mimic2);
+    }
+
+    virtual void work() const
+    {
+        if (mimic2)
+        {
+            mimic2->work();
+            return;
+        }
+
+        cout << "A()" << endl;
+    }
+
+    virtual void clone(Mimic*& m) const
+    {
+        m = new A();
+    }
+
+    virtual void clone(A*& a) const
+    {
+        a = new A();
+    }
+
+    virtual A& operator=(const A& m)
+    {
+        if (&m == this)
+            return *this;
+        if (mimic2)
+        {
+            delete mimic2;
+            mimic2 = NULL;
+        }
+        if (m.mimic2)
+            m.mimic2->clone(mimic2);
+        else
+            m.clone(mimic2);
+
+        return *this;
+    }
+
+};
+
+class B: public A
+{
+
+public:
+
+    B()
+    {
+    }
+
+    B(const B& b) :
+        A()
+    {
+    }
+
+    virtual void work() const
+    {
+        cout << "B()" << endl;
+    }
+
+    virtual void clone(Mimic*& m) const
+    {
+        m = new B();
+    }
+
+    virtual void clone(A*& a) const
+    {
+        a = new B();
+    }
+
+    virtual B& operator=(const B& m)
+    {
+        if (&m == this)
+            return *this;
+        return *this;
+    }
+
+};
+
+class C: public B
+{
+
+private:
+    // USE THIS TO DISABLE FUTURE SLICINGS WITHOUT THE MIMIC
+    // To force a compile error for non-friends (thanks bk1e)
+    // Not implemented, so will cause a link error for friends
+    template<typename T> C(T const& d);
+    template<typename T> C const& operator=(T const& rhs);
+
+public:
+
+    C()
+    {
+    }
+
+    C(const C& c) :
+        B()
+    {
+    }
+
+    virtual void work()
+    {
+        cout << "C()" << endl;
+    }
+
+    virtual void clone(Mimic* m)
+    {
+        m = new C();
+    }
+
+};
+
+
+class D: public C
+{
+public:
+
+    D()
+    {
+    }
+
+    D(const D& d) :
+        C()
+    {
+    }
+
+    virtual void work()
+    {
+        cout << "D()" << endl;
+    }
+
+    virtual void clone(Mimic* m)
+    {
+        m = new D();
+    }
+
+};
+
+
+
+void print(A& a)
+{
+    cout << "print A: ";
+    a.work();
+}
+
+void print(B& b)
+{
+    cout << "print B: ";
+    b.work();
+}
+
+void print(C& c)
+{
+    cout << "print C: ";
+    c.work();
+}
+
+
+int main()
+{
+    cout << "BEGIN TESTS" << endl;
+
+    //testmove();
+
+    A* ap = new A();
+    B* bp = new B();
+    A* abp = new B();
+    print(*ap);
+    print(*bp);
+    print(*abp);
+
+    cout << endl << endl;
+
+
+    B b;
+    b.work();
+    print(b);
+
+    A a = b;
+    a.work();
+    print(a);
+
+    C c;
+    c.work();
+    print(c);
+
+    b = c;
+    b.work();
+    print(b);
 
     cout << "FINISHED OK!" << endl;
     return 0;
 }
-;
 
