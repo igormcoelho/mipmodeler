@@ -16,7 +16,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#include "MIPModel.h"
+#include "MIPModel.hpp"
 
 using namespace std;
 

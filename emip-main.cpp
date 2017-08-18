@@ -8,10 +8,10 @@
 
 #include<iostream>
 
-#include "EMIPModeler.hpp"
+#include "EMIP/EMIPModeler.hpp"
 
-#include "MIPModel.h"
-#include "MIPVarArray.h"
+#include "SimpleMIP/MIPModel.hpp"
+#include "SimpleMIP/MIPVarArray.hpp"
 
 //#include "EMIPReader.h"
 

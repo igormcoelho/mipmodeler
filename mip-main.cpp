@@ -8,8 +8,8 @@
 
 #include<iostream>
 
-#include "MIPModel.h"
-#include "MIPVarArray.h"
+#include "SimpleMIP/MIPModel.hpp"
+#include "SimpleMIP/MIPVarArray.hpp"
 
 using namespace std;
 
